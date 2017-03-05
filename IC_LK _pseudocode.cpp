@@ -12,7 +12,7 @@ Warp I with W(x;p) to compute I(W(x;p))
 Compute the error image I(W(x;p)) - T(x)
 Compute vector multiplication of steepest descent and error. E = sdi' * error;
 Compute dp = inv(H)*E;
-Update warp W(x;p) <- W(x;p) ○ W(x;dp)^-1
+Update warp W(x, p) = W(x, p) * W(x, delta)^-1 = W(W(x, delta)^-1, p)
 Until dp <= threshold
 **/
 
@@ -31,4 +31,5 @@ protected:
   cv::Mat computeHessian(cv::Mat& image, warping_mat); // Hessian = (sdi)' * (sdi)
   ? computeHammingDistance(cv::Mat& image, cv::Mat& template); // compute Hamming distance
   params = computeParamUpdate(? HammingDistance); // warp parameter arameter update. dp = H \ E. E = sdi' * HammingDistance.
+  cv::Mat interpolate(const cv::Mat image, const::Rect bbox); // sample image from the target image 
 }

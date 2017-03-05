@@ -31,4 +31,4 @@ protected:
   cv::Mat computeHessian(cv::Mat& image, warping_mat); // Hessian = (sdi)' * (sdi)
   ? computeHammingDistance(cv::Mat& image, cv::Mat& template); // compute Hamming distance
   params = computeParamUpdate(? HammingDistance); // warp parameter arameter update. dp = H \ E. E = sdi' * HammingDistance.
-  
+}

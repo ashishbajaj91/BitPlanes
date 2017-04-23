@@ -41,7 +41,7 @@ bool testGenerateBitplanes(cv::Mat &image)
 
 bool testimwarp(cv::Mat &image)
 {
-	auto img_src_f = convertToFloat(image);
+	auto img_src_f = convertToDouble(image);
 	Eigen::Matrix3f W(3, 3); 
 
 	W << 0.7	, -0.7	, 0,

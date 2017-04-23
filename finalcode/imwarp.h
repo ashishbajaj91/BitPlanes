@@ -18,9 +18,8 @@ T Interpolate(cv::Mat &image, imwarpdatatype  y, imwarpdatatype  x)
 	int xi = int(floor(x));
 	int yi = int(floor(y));
 	
-	
-	imwarpdatatype k1 = modf(x, &xd); // k1 is the fractional, xd is the integer of x
-	imwarpdatatype k2 = modf(y, &yd);
+	imwarpdatatype k1 = modff(x, &xd); // k1 is the fractional, xd is the integer of x
+	imwarpdatatype k2 = modff(y, &yd);
 
 	// Check whether the pixels are within the image
 	if (xi >= 0 && (xi < image.cols - 1) && yi >= 0 && (yi < image.rows - 1))
@@ -80,7 +79,7 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3f warpMat, int out_size[])
 			imwarpdatatype  x = X(1) / X(2);
 			imwarpdatatype  I2 = Interpolate<imwarpdatatype >(imgSrc, imwarpdatatype(y + ((imageHeight + 1) / 2.0 - 1)),
 				imwarpdatatype(x + ((imageWidth + 1) / 2.0) - 1));
-			target.at<double>(v, u) = I2;
+			target.at<imwarpdatatype>(v, u) = I2;
 		}
 	}
 	return target;

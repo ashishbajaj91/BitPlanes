@@ -6,10 +6,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
-float * getWeights(int nrows, int ncols)
+double * getWeights(int nrows, int ncols)
 {
-	float wts[] = { 1.0f, 1.0f, 1.0204f, 0.03125f, 1.0313f, 0.0204f, 0.00055516f, 0.00055516f };
-	float s = sqrt(float(nrows*ncols)) / 128.0f;
+	double wts[] = { 1.0f, 1.0f, 1.0204f, 0.03125f, 1.0313f, 0.0204f, 0.00055516f, 0.00055516f };
+	double s = sqrt(double(nrows*ncols)) / 128.0;
 	wts[2] = pow(wts[2],(1/s));
 	wts[3] /= s;
 	wts[4] = pow(wts[4], (1 / s));
@@ -20,20 +20,20 @@ float * getWeights(int nrows, int ncols)
 	return wts;
 }
 
-float getEpsilon()
+double getEpsilon()
 {
-	return 1e-3;
+	return double(1e-3);
 }
 
-float getLambda()
+double getLambda()
 {
-	return 1e-6;
+	return double(1e-6);
 }
 
-float * getKeep(std::string method)
+double * getKeep(std::string method)
 {
-	float keep[] = {0.0f, 0.0f, 0.0f, 0.0f, 
-					0.0f, 0.0f, 0.0f, 0.0f};
+	double keep[] = {0.0, 0.0, 0.0, 0.0, 
+					 0.0, 0.0, 0.0, 0.0};
 
 	if (method == "transation")
 	{

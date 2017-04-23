@@ -5,7 +5,7 @@
 #include <vector>
 #include <math.h>
 
-typedef float imgtype ;
+typedef double imgtype ;
 typedef Eigen::MatrixXf matrixtype ;
 
 void InitializeHs(std::vector<matrixtype> &Hs)

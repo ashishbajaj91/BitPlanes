@@ -22,7 +22,7 @@ cv::Mat convertToGrayScale(cv::Mat &image)
 		return image;
 }
 
-cv::Mat_<float> convertToFloat(cv::Mat &image, bool isbitplaneImage = false)
+cv::Mat convertToFloat(cv::Mat &image, bool isbitplaneImage = false)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
 
@@ -33,7 +33,7 @@ cv::Mat_<float> convertToFloat(cv::Mat &image, bool isbitplaneImage = false)
 	return float_image;
 }
 
-cv::Mat_<double> convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
+cv::Mat convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
 

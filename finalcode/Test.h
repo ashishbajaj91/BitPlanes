@@ -34,15 +34,14 @@ bool testGenerateBitplanes(cv::Mat &image)
 		createNamedWindow( (winname + std::to_string(k)).c_str() );
 		cv::Mat temp = 255 * bitplaneImage[k];
 		showImage(temp, (winname + std::to_string(k)).c_str());
-
 	}
 	return true;
 }
 
 bool testimwarp(cv::Mat &image)
 {
-	auto img_src_f = convertToFloat(image);
-	Eigen::Matrix3f W(3, 3); 
+	auto img_src_f = convertToDouble(image);
+	Eigen::Matrix3d W(3, 3); 
 
 	W << 0.7	, -0.7	, 0,
 		 0.7	, 0.7	, 0,

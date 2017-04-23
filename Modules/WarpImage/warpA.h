@@ -6,16 +6,16 @@
 #include<opencv2/opencv.hpp>
 #include <cmath>
 
-float fNaN = std::numeric_limits<float>::quiet_NaN();
+double fNaN = std::numeric_limits<double>::quiet_NaN();
 
 template <class T>
-T Interpolate(cv::Mat &image, float y, float x)
+T Interpolate(cv::Mat &image, double y, double x)
 {
-    float xd, yd;
+    double xd, yd;
     int xi = int(floor(x));
     int yi = int(floor(y));
-    float k1 = modff(x, &xd); // k1 is the fractional, xd is the integer of x
-    float k2 = modff(y, &yd);
+    double k1 = modf(x, &xd); // k1 is the fractional, xd is the integer of x
+    double k2 = modf(y, &yd);
 
     // Check whether the pixels are within the image
     if(xi >= 0 && (xi < image.cols-1) && yi >=0 && (yi < image.rows-1))
@@ -43,7 +43,7 @@ T Interpolate(cv::Mat &image, float y, float x)
  * warpMat: warping function, 3x3
  * out_size: output image size, [rows, cols]
  */
-cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3f warpMat, int out_size[])
+cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int out_size[])
 {
     int imageWidth = imgSrc.cols;
     int imageHeight = imgSrc.rows;
@@ -56,20 +56,20 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3f warpMat, int out_size[])
     warpMat = warpMat.inverse().eval();
     warpMat /= warpMat(2,2);
 
-    Eigen::Vector3f X;      // Point in coordinate frame of source.
-    Eigen::Vector3f U;      // Point in coordinate frame of target.
+    Eigen::Vector3d X;      // Point in coordinate frame of source.
+    Eigen::Vector3d U;      // Point in coordinate frame of target.
 
     for(int v = 0; v < targetRows; v++)
     {
         for (int u = 0; u < targetCols; u++)
         {
-            U = Eigen::Vector3f(v - ((imageHeight + 1) / 2.0 - 1), u - ((imageWidth + 1) / 2.0 - 1), 1.0);
+            U = Eigen::Vector3d(v - ((imageHeight + 1) / 2.0 - 1), u - ((imageWidth + 1) / 2.0 - 1), 1.0);
             X = warpMat * U;
-            float y = X(0) / X(2);
-            float x = X(1) / X(2);
-            float I2 = Interpolate<float>(imgSrc, float(y + ((imageHeight + 1) / 2.0 - 1)),
-                                          float(x + ((imageWidth + 1) / 2.0) - 1));
-            target.at<float>(v, u) = I2;
+            double y = X(0) / X(2);
+            double x = X(1) / X(2);
+            double I2 = Interpolate<double>(imgSrc, double(y + ((imageHeight + 1) / 2.0 - 1)),
+                                          double(x + ((imageWidth + 1) / 2.0) - 1));
+            target.at<double>(v, u) = I2;
         }
     }
     return target;

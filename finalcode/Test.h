@@ -6,6 +6,7 @@
 #include "readImage.h"
 #include "readVideo.h"
 #include "generateBitplanes.h"
+#include "imwarp.h"
 
 bool testReadImage(const cv::String &imagefilename)
 {
@@ -22,13 +23,36 @@ bool testReadVideo(const cv::String &videofilename)
 bool testGenerateBitplanes(cv::Mat &image)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
-	cv::Mat bitplaneImage = generateBitPlanes(gray_image);
+	auto bitplaneImage = generateBitPlanes(gray_image);
 
-	if (!bitplaneImage.data)
-		return false;
+	for (int k = 0; k < 8; k++)
+	{
+		if (!bitplaneImage[k].data)
+			return false;
 
-	createNamedWindow("bitplaneImage");
-	showImage(bitplaneImage, "bitplaneImage");
+		std::string winname = "bitplaneImage";
+		createNamedWindow( (winname + std::to_string(k)).c_str() );
+		cv::Mat temp = 255 * bitplaneImage[k];
+		showImage(temp, (winname + std::to_string(k)).c_str());
+
+	}
+	return true;
+}
+
+bool testimwarp(cv::Mat &image)
+{
+	auto img_src_f = convertToFloat(image);
+	Eigen::Matrix3f W(3, 3); 
+
+	W << 0.7	, -0.7	, 0,
+		 0.7	, 0.7	, 0,
+		 0		, 0		, 1;
+
+	int out_size[] = { img_src_f.rows, img_src_f.cols };
+	cv::Mat target = ApplyWarp(img_src_f, W, out_size);
+
+	showImage(img_src_f, "original image");
+	showImage(target, "warped image");
 	return true;
 }
 
@@ -58,6 +82,16 @@ void RunTestGenerateBitplanes(cv::String filename)
 		std::cout << "BitPlanes Test Failed" << std::endl;
 }
 
+void RunTestImwarp(cv::String filename)
+{
+	cv::Mat image;
+	readImage(image, filename);
+	if (testimwarp(image))
+		std::cout << "ImWarp Test Succeeded" << std::endl;
+	else
+		std::cout << "Imwarp Test Failed" << std::endl;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -68,6 +102,10 @@ void RunTests(int argc, char** argv)
 		destroyWindow("All");
 
 		RunTestGenerateBitplanes(argv[1]);
+		cv::waitKey(0);
+		destroyWindow("All");
+
+		RunTestImwarp(argv[1]);
 		cv::waitKey(0);
 		destroyWindow("All");
 	}

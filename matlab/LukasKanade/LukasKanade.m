@@ -13,7 +13,8 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
       dI0=abs(dI);
       M=Mref & ~isnan(Ip); 
       M0=M; 
-      M1=find(M); D=Ds(M1,:); 
+      M1=find(M); 
+	  D=Ds(M1,:); 
       ds1=(D'*D + lambda)^(-1)*(D'*dI(M1));
       if(any(isnan(ds1))), ds1=zeros(K,1); end
       ds(keep)=ds1; 

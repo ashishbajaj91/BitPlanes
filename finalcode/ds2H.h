@@ -16,7 +16,7 @@ void InitializeHs(std::vector<matrixtype> &Hs)
 	}
 }
 
-std::vector<matrixtype> ds2Hs(imgtype * ds, imgtype *wts )
+std::vector<matrixtype> ds2Hs(imgtype *ds, imgtype *wts )
 {
 	std::vector<matrixtype> Hs;
 	InitializeHs(Hs);

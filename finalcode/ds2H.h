@@ -1,20 +1,26 @@
 #ifndef DS2H_IS_INCLUDED
 #define DS2H_IS_INCLUDED
+
 #include <Eigen/Dense>
 #include <vector>
 #include <math.h>
 
 typedef float imgtype ;
-
 typedef Eigen::MatrixXf matrixtype ;
+
+void InitializeHs(std::vector<matrixtype> &Hs)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		Hs.push_back(matrixtype::Identity(3, 3));
+	}
+}
 
 std::vector<matrixtype> ds2Hs(imgtype * ds, imgtype *wts )
 {
 	std::vector<matrixtype> Hs;
-	for( int i =0 ; i < 8; i++)
-	{
-		Hs.push_back(matrixtype::Identity(3,3));
-	}
+	InitializeHs(Hs);
+
 	(Hs[0])(1,2) = wts[0]*ds[0];	// 1 x translation
 	(Hs[1])(0,2) = wts[1]*ds[1];	// 2 y translation
 	(Hs[2])(0,0) = pow(wts[2],ds[2]);	// 3 scale
@@ -44,10 +50,9 @@ std::vector<matrixtype> ds2Hs(imgtype * ds, imgtype *wts )
 	(Hs[7])(2,2) = ct;
 	(Hs[7])(1,2) = -st;
 	(Hs[7])(2,1) = st ;
-
 	return Hs;
-
 }
+
 matrixtype Hs2H(std::vector<matrixtype> Hs)
 {
 	matrixtype H = matrixtype::Identity(3,3);
@@ -57,5 +62,4 @@ matrixtype Hs2H(std::vector<matrixtype> Hs)
 	}
 	return H; 
 }
-
 #endif

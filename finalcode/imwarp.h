@@ -17,9 +17,9 @@ T Interpolate(cv::Mat &image, imwarpdatatype  y, imwarpdatatype  x)
 
 	int xi = int(floor(x));
 	int yi = int(floor(y));
-	
-	imwarpdatatype k1 = modff(x, &xd); // k1 is the fractional, xd is the integer of x
-	imwarpdatatype k2 = modff(y, &yd);
+
+	imwarpdatatype k1 = modf(x, &xd); // k1 is the fractional, xd is the integer of x
+	imwarpdatatype k2 = modf(y, &yd);
 
 	// Check whether the pixels are within the image
 	if (xi >= 0 && (xi < image.cols - 1) && yi >= 0 && (yi < image.rows - 1))
@@ -53,7 +53,7 @@ cv::Mat InitializeTargetImage(int nrows, int ncols, int imagetype, cv::Scalar sc
 * warpMat: warping function, 3x3
 * out_size: output image size, [rows, cols]
 */
-cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3f warpMat, int out_size[])
+cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int out_size[])
 {
 	int imageWidth = imgSrc.cols;
 	int imageHeight = imgSrc.rows;
@@ -66,14 +66,14 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3f warpMat, int out_size[])
 	warpMat = warpMat.inverse().eval();
 	warpMat /= warpMat(2, 2);
 
-	Eigen::Vector3f X;      // Point in coordinate frame of source.
-	Eigen::Vector3f U;      // Point in coordinate frame of target.
+	Eigen::Vector3d X;      // Point in coordinate frame of source.
+	Eigen::Vector3d U;      // Point in coordinate frame of target.
 
 	for (int v = 0; v < targetRows; v++)
 	{
 		for (int u = 0; u < targetCols; u++)
 		{
-			U = Eigen::Vector3f(v - ((imageHeight + 1) / 2.0 - 1), u - ((imageWidth + 1) / 2.0 - 1), 1.0);
+			U = Eigen::Vector3d(v - ((imageHeight + 1) / 2.0 - 1), u - ((imageWidth + 1) / 2.0 - 1), 1.0);
 			X = warpMat * U;
 			imwarpdatatype  y = X(0) / X(2);
 			imwarpdatatype  x = X(1) / X(2);

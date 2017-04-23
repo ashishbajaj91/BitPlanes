@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 
-typedef double imwarpdatatype;
+typedef float imwarpdatatype;
 
 imwarpdatatype fNaN = std::numeric_limits<imwarpdatatype>::quiet_NaN();
 

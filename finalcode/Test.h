@@ -41,7 +41,7 @@ bool testGenerateBitplanes(cv::Mat &image)
 
 bool testimwarp(cv::Mat &image)
 {
-	auto img_src_f = convertToDouble(image);
+	auto img_src_f = convertToFloat(image);
 	Eigen::Matrix3f W(3, 3); 
 
 	W << 0.7	, -0.7	, 0,
@@ -53,6 +53,16 @@ bool testimwarp(cv::Mat &image)
 
 	showImage(img_src_f, "original image");
 	showImage(target, "warped image");
+	return true;
+}
+
+bool testpadImages(cv::Mat &image)
+{
+	cv::Mat result = AddPaddingToImage(image, 10, 10, 10, 10, 0);
+	showImage(result, "Padded Image");
+
+	if (image.cols != result.cols - 20 || image.rows != result.rows - 20)
+		return false;
 	return true;
 }
 
@@ -92,6 +102,15 @@ void RunTestImwarp(cv::String filename)
 		std::cout << "Imwarp Test Failed" << std::endl;
 }
 
+void RunTestPadImage(cv::String filename)
+{
+	cv::Mat image;
+	readImage(image, filename);
+	if (testpadImages(image))
+		std::cout << "Pad Images Test Succeeded" << std::endl;
+	else
+		std::cout << "Pad Images Failed" << std::endl;
+}
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -108,6 +127,11 @@ void RunTests(int argc, char** argv)
 		RunTestImwarp(argv[1]);
 		cv::waitKey(0);
 		destroyWindow("All");
+
+		RunTestPadImage(argv[1]);
+		cv::waitKey(0);
+		destroyWindow("All");
+
 	}
 	if (argc > 2)
 	{

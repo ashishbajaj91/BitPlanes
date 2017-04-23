@@ -38,11 +38,6 @@ std::vector<cv::Mat> generateBitPlanes(cv::Mat &grayimage)
 			newp5[j - 1] = (test > (orgp + 1)[j - 1]);
 			newp6[j - 1] = (test > (orgp + 1)[j]);
 			newp7[j - 1] = (test > (orgp + 1)[j + 1]);
-
-			//newp[j - 1] = (test >(orgp - 1)[j - 1]) + 2 * (test >(orgp - 1)[j])
-			//	+ 4 * (test > (orgp - 1)[j + 1]) + 8 * (test > orgp[j - 1])
-			//	+ 16 * (test > orgp[j + 1]) + 32 * (test > (orgp + 1)[j - 1])
-			//	+ 64 * (test > (orgp + 1)[j]) + 128 * (test > (orgp + 1)[j + 1]);
 		}
 	}
 	return image_channels;

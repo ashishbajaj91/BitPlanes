@@ -49,13 +49,13 @@ bool testimwarp(cv::Mat &image)
 		 0		, 0		, 1;
 
 	int out_size[] = { img_src.rows, img_src.cols };
-	cv::Mat target = ApplyWarp(img_src, W, out_size);
+	cv::Mat target = ApplyWarp(img_src, W, img_src.rows, img_src.cols);
 
 	showImage(img_src, "original image");
 	showImage(target, "warped image");
 
 	W = Eigen::Matrix3d::Identity(3, 3);
-	cv::Mat target2 = ApplyWarp(img_src, W, out_size);
+	cv::Mat target2 = ApplyWarp(img_src, W, img_src.rows, img_src.cols);
 
 	return cv::countNonZero(target2 - img_src > 1e-10) == 0;
 }

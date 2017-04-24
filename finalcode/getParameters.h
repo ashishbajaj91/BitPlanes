@@ -68,7 +68,7 @@ double * getKeep(std::string method)
 		keep[6] = 1;
 		keep[7] = 1;
 	}
-	else if (method == "projectiive")
+	else if (method == "projective")
 	{
 		keep[0] = 1;
 		keep[1] = 1;
@@ -79,7 +79,19 @@ double * getKeep(std::string method)
 		keep[6] = 1;
 		keep[7] = 1;
 	}
+	else
+	{
+		std::cout << "Invalid Method" << std::endl;
+	}
 	return keep;
+}
+
+int getNoOfParameters(double keep[])
+{
+	int nParameters = 0;
+	for (int i = 0; i < 8; i++)
+		if (keep[i] > 1e-6)
+			nParameters++;
 }
 
 #endif

@@ -6,7 +6,7 @@
 #include <math.h>
 
 typedef double imgtype ;
-typedef Eigen::MatrixXd matrixtype ;
+typedef Eigen::Matrix3d matrixtype ;
 
 void InitializeHs(std::vector<matrixtype> &Hs)
 {

@@ -6,6 +6,8 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 
+#include "Utility.h"
+
 typedef double imwarpdatatype;
 
 imwarpdatatype fNaN = std::numeric_limits<imwarpdatatype>::quiet_NaN();
@@ -48,21 +50,12 @@ cv::Mat InitializeTargetImage(int nrows, int ncols, int imagetype, cv::Scalar sc
 	return cv::Mat(nrows, ncols, imagetype, scalar);
 }
 
-/**
-* imgSrc: input image
-* warpMat: warping function, 3x3
-* out_size: output image size, [rows, cols]
-*/
-cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int out_size[])
+cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
 {
 	int imageWidth = imgSrc.cols;
 	int imageHeight = imgSrc.rows;
 
-	// Set target image size and type
-	int targetRows = out_size[0];
-	int targetCols = out_size[1];
-
-	cv::Mat target = InitializeTargetImage(out_size[0], out_size[1], imgSrc.type(), cv::Scalar(fNaN));
+	cv::Mat target = InitializeTargetImage(targetRows, targetCols, imgSrc.type(), cv::Scalar(fNaN));
 	warpMat = warpMat.inverse().eval();
 	warpMat /= warpMat(2, 2);
 

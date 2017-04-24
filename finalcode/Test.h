@@ -7,6 +7,7 @@
 #include "readVideo.h"
 #include "generateBitplanes.h"
 #include "imwarp.h"
+#include "ds2H.h"
 
 bool testReadImage(const cv::String &imagefilename)
 {
@@ -69,6 +70,20 @@ bool testpadImages(cv::Mat &image)
 	return true;
 }
 
+bool testds2H()
+{
+	double wts[] = { 1, 1, 1, 1,
+					1, 1, 1, 1 };
+
+	double ds[] = { 0, 0, 0, 0,
+					 0, 0, 0, 0 };
+
+	auto Hs = ds2Hs(ds, wts);
+	auto H = Hs2H(Hs);
+	
+	return (H == Eigen::Matrix3d::Identity(3, 3));
+}
+
 void RunTestReadImage(cv::String filename)
 {
 	if (testReadImage(filename))
@@ -114,6 +129,15 @@ void RunTestPadImage(cv::String filename)
 	else
 		std::cout << "Pad Images Failed" << std::endl;
 }
+
+void RunTestDs2H()
+{
+	if (testds2H())
+		std::cout << "Ds2H Test Succeeded" << std::endl;
+	else
+		std::cout << "Ds2H Test Failed" << std::endl;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -134,13 +158,15 @@ void RunTests(int argc, char** argv)
 		RunTestPadImage(argv[1]);
 		cv::waitKey(0);
 		destroyWindow("All");
-
 	}
 	if (argc > 2)
 	{
 		RunTestReadVideo(argv[2]);
 		destroyWindow("All");
 	}
+
+	RunTestDs2H();
+		
 	std::cout << "All Tests Done" << std::endl;
 }
 

@@ -40,19 +40,23 @@ bool testGenerateBitplanes(cv::Mat &image)
 
 bool testimwarp(cv::Mat &image)
 {
-	auto img_src_f = convertToDouble(image);
+	auto img_src = convertToDouble(image);
 	Eigen::Matrix3d W(3, 3); 
 
 	W << 0.7	, -0.7	, 0,
 		 0.7	, 0.7	, 0,
 		 0		, 0		, 1;
 
-	int out_size[] = { img_src_f.rows, img_src_f.cols };
-	cv::Mat target = ApplyWarp(img_src_f, W, out_size);
+	int out_size[] = { img_src.rows, img_src.cols };
+	cv::Mat target = ApplyWarp(img_src, W, out_size);
 
-	showImage(img_src_f, "original image");
+	showImage(img_src, "original image");
 	showImage(target, "warped image");
-	return true;
+
+	W = Eigen::Matrix3d::Identity(3, 3);
+	cv::Mat target2 = ApplyWarp(img_src, W, out_size);
+
+	return cv::countNonZero(target2 - img_src > 1e-10) == 0;
 }
 
 bool testpadImages(cv::Mat &image)

@@ -38,8 +38,6 @@ void warpCoords(double inCoords[8], int image_size[2], Eigen::Matrix3d warpMat, 
     {
         warpedCoords[2 * index]     =   newCoords(1,index) / newCoords(2,index) + xOffset; // x
         warpedCoords[2 * index+1]   =   newCoords(0,index) / newCoords(2,index) + yOffset; // y
-        std::cout << warpedCoords[2 * index] << std::endl;
-        std::cout << warpedCoords[2 * index + 1] << std::endl;
     }
 
 }

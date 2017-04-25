@@ -8,6 +8,8 @@
 #include "generateBitplanes.h"
 #include "imwarp.h"
 #include "ds2H.h"
+#include "ComputeDs.h"
+#include "lukaskanade.h"
 
 bool testReadImage(const cv::String &imagefilename)
 {
@@ -82,6 +84,38 @@ bool testds2H()
 	auto H = Hs2H(Hs);
 	
 	return (H == Eigen::Matrix3d::Identity(3, 3));
+}
+
+bool testSubtract()
+{
+	cv::Mat_<uint8_t> a(10, 10), b(10, 10);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			a(i, j) = i * 10 + j;
+			b(i, j) = j * 10 + i;
+		}
+	}
+
+	cv::Mat_<double> adoub = convertToDouble(a);
+	cv::Mat_<double> bdoub = convertToDouble(b);
+	
+	cv::Mat_<double> result;
+	return SubtractImages(result, adoub, bdoub);
+}
+
+bool testLucasKanade()
+{
+	double wts[5], keep[5];
+
+	Eigen::Matrix3d H;
+	H << 1, 0, 0,
+		0, 1, 0,
+		0, 0, 1;
+
+	return LukasKanade(cv::Mat_<double>(), cv::Mat_<double>(), H, cv::Mat_<double>(), cv::Mat_<int>(), 8, wts, keep);
 }
 
 void RunTestReadImage(cv::String filename)
@@ -166,6 +200,15 @@ void RunTests(int argc, char** argv)
 	}
 
 	RunTestDs2H();
+	//if (testSubtract())
+	{
+		//std::cout << "Subtraction Tested" << std::endl;
+	}
+
+	if (testLucasKanade())
+	{
+		std::cout << "Lucas Kanade Tested" << std::endl;
+	}
 		
 	std::cout << "All Tests Done" << std::endl;
 }

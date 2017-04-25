@@ -9,7 +9,6 @@
 #include "imwarp.h"
 #include "ds2H.h"
 #include "ComputeDs.h"
-#include "lukaskanade.h"
 
 bool testReadImage(const cv::String &imagefilename)
 {
@@ -106,18 +105,6 @@ bool testSubtract()
 	return SubtractImages(result, adoub, bdoub);
 }
 
-bool testLucasKanade()
-{
-	double wts[5], keep[5];
-
-	Eigen::Matrix3d H;
-	H << 1, 0, 0,
-		0, 1, 0,
-		0, 0, 1;
-
-	return LukasKanade(cv::Mat_<double>(), cv::Mat_<double>(), H, cv::Mat_<double>(), cv::Mat_<int>(), 8, wts, keep);
-}
-
 void RunTestReadImage(cv::String filename)
 {
 	if (testReadImage(filename))
@@ -200,14 +187,9 @@ void RunTests(int argc, char** argv)
 	}
 
 	RunTestDs2H();
-	//if (testSubtract())
+	if (testSubtract())
 	{
-		//std::cout << "Subtraction Tested" << std::endl;
-	}
-
-	if (testLucasKanade())
-	{
-		std::cout << "Lucas Kanade Tested" << std::endl;
+		std::cout << "Subtraction Tested" << std::endl;
 	}
 		
 	std::cout << "All Tests Done" << std::endl;

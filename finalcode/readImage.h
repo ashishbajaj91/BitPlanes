@@ -36,7 +36,7 @@ cv::Mat convertToFloat(cv::Mat &image, bool isbitplaneImage = false)
 cv::Mat convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
-
+	
 	cv::Mat_<double> double_image;
 	gray_image.convertTo(double_image, CV_64F);
 	if (!isbitplaneImage)

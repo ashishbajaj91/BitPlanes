@@ -21,18 +21,19 @@ void warpCoords(double inCoords[8], int image_size[2], Eigen::Matrix3d warpMat, 
     auto imgHeight = image_size[0];
     double xOffset = (imgWidth + 1)/2.0 - 1;
     double yOffset = (imgHeight + 1)/2.0 - 1;
-
+    
     Eigen::MatrixXd inMatrix(3,4); // [y1, y2, y3, y4; x1, x2, x3, x4; 1, 1, 1, 1]
-    inMatrix.col(0) << inCoords[1]-yOffset, inCoords[0]-xOffset, 1.0; //[y1, x1, 1]
-    inMatrix.col(1) << inCoords[3]-yOffset, inCoords[2]-xOffset, 1.0; //[y2, x2, 1]
-    inMatrix.col(2) << inCoords[5]-yOffset, inCoords[4]-xOffset, 1.0; //[y3, x3, 1]
-    inMatrix.col(3) << inCoords[7]-yOffset, inCoords[6]-xOffset, 1.0; //[y4, x4, 1]
-
+    
+    for (int index = 0; index<4; index++)
+    {
+        inMatrix.col(index) << inCoords[index * 2 + 1] - yOffset, inCoords[index * 2] - xOffset, 1.0; // (y, x, 1)
+    }
+    
     warpMat = warpMat.inverse().eval();
     warpMat /= warpMat(2,2);
-
+    
     auto newCoords = warpMat * inMatrix;
-
+    
     for (int index = 0; index<3; index++)
     {
         warpedCoords[2 * index]     =   newCoords(1,index) / newCoords(2,index) + xOffset; // x
@@ -52,7 +53,7 @@ void drawBoundingBox(double ptsCoords[8], cv::Mat &img2Draw)
     int linethickness = 1;
     int lineType = 8;
     int shift = 0;
-
+    
     for (int lineNum = 0; lineNum < 3; lineNum++)
     {
         int xi  = (int)std::round(ptsCoords[(2 * lineNum)   % 8]);

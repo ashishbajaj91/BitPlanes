@@ -1,5 +1,5 @@
-function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
-    [h,w,~] = size(I); 
+function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda, rect)
+    [h,w,l] = size(I); 
     h = h-2;
     w = w-2;
 
@@ -12,7 +12,8 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
       %if(s(3)<=1e-4*s(1)), H=eye(3); return; end
       %Ip=warpA( I, H, size(I) );
       Ip = WarpBitPlane(I,H);
-      dI=Ip-Iref; 
+      dI = zeros(size(Iref));
+      dI(rect(1):rect(3),rect(2):rect(4),:)=Ip(rect(1):rect(3),rect(2):rect(4),:)-Iref(rect(1):rect(3),rect(2):rect(4),:); 
       dI0=abs(dI);
       dI = sum(dI,3)/8;
       dI0 = sum(dI0,3)/8;

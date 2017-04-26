@@ -22,31 +22,13 @@ cv::Mat convertToGrayScale(cv::Mat &image)
 		return image;
 }
 
-cv::Mat convertToFloat(cv::Mat &image, bool isbitplaneImage = false)
+cv::Mat convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
 
-	cv::Mat_<float> float_image;
-	gray_image.convertTo(float_image, CV_32F);
-	if(!isbitplaneImage)
-		float_image /= 255;
-	return float_image;
-}
-
-cv::Mat convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
-{
-	cv::Mat_<uint8_t> gray_image = convertToGrayScale(image);
-
 	cv::Mat_<double> double_image(gray_image.rows, gray_image.cols);
-	
-	for (int i = 0; i < double_image.rows; ++i)
-	{
-		for (int j = 0; j < double_image.cols; ++j)
-		{
-			double_image(i, j) = gray_image(i, j);
-		}
-	}
-	
+	gray_image.convertTo(double_image, CV_64F);
+
 	if (!isbitplaneImage)
 		double_image /= 255.0;
 

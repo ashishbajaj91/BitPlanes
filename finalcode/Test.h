@@ -103,8 +103,19 @@ bool testSubtract()
 	cv::Mat_<double> bdoub = convertToDouble(b);
 	
 	cv::Mat_<double> result;
-
-	return SubtractImages(result, adoub, bdoub);
+	if (SubtractImages(result, adoub, bdoub))
+	{
+		for (int i = 0; i < 10; ++i)
+		{
+			for (int j = 0; j < 10; ++j)
+			{
+				std::cout << result(i, j) << " ";
+			}
+			std::cout << std::endl;
+		}
+		return true;
+	}
+	return false;
 }
 
 bool testLucasKanade()

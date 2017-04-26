@@ -14,16 +14,8 @@ bool SubtractImages(cv::Mat_<double> &result, cv::Mat_<double> &image1, cv::Mat_
 {
 	if (image1.cols != image2.cols || image1.rows != image2.rows || image1.dims != image2.dims)
 		return false;
+	cv::subtract(image1, image2, result);
 
-	result.create(image1.rows, image1.cols);
-
-	for (int i = 0; i < image1.rows; ++i)
-	{
-		for (int j = 0; j < image2.rows; ++j)
-		{
-			result(i, j) = image1(i, j) - image2(i, j);
-		}
-	}
 	return true;
 }
 

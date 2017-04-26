@@ -103,6 +103,7 @@ bool testSubtract()
 	cv::Mat_<double> bdoub = convertToDouble(b);
 	
 	cv::Mat_<double> result;
+
 	return SubtractImages(result, adoub, bdoub);
 }
 
@@ -200,9 +201,9 @@ void RunTests(int argc, char** argv)
 	}
 
 	RunTestDs2H();
-	//if (testSubtract())
+	if (testSubtract())
 	{
-		//std::cout << "Subtraction Tested" << std::endl;
+		std::cout << "Subtraction Tested" << std::endl;
 	}
 
 	if (testLucasKanade())

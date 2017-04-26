@@ -1,4 +1,4 @@
-function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
+function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda, rect)
     [h,w] = size(I); 
     h = h-2;
     w = w-2;
@@ -11,7 +11,8 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
       %s=svd(H); 
       %if(s(3)<=1e-4*s(1)), H=eye(3); return; end
       Ip=warpA( I, H, size(I) );
-      dI=Ip-Iref; 
+      dI = zeros(size(Iref));
+      dI(rect(1):rect(3),rect(2):rect(4))=Ip(rect(1):rect(3),rect(2):rect(4))-Iref(rect(1):rect(3),rect(2):rect(4)); 
       dI0=abs(dI);
       M=Mref & ~isnan(Ip); 
       M0=M; 

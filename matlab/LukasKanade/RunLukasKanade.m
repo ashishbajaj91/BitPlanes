@@ -1,7 +1,7 @@
 close all;
 warning('off', 'all')
 
-v = VideoReader('bitplanes_data/v9.mov');
+v = VideoReader('../bitplanes_data/v9.mov');
 rect = [100, 190, 650, 900];
 
 figure; hold on;
@@ -14,7 +14,7 @@ while hasFrame(v)
         I = double(rgb2gray(v1))/255;
         I = imgaussfilt(I,sig);
         [I, ~] = padimages(I, Iref);
-        H = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda);
+        H = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda, rect);
     else
         sig = 2;
         Iref = double(rgb2gray(v1))/255;

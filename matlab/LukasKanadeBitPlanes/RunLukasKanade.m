@@ -18,7 +18,7 @@ while hasFrame(v)
         I_bitPlane = imgaussfilt(I_bitPlane,sig);
         
         [I_bitPlane, ~] = padbitPlanesimages(I_bitPlane, Iref_bitPlane);
-        H = LukasKanade(I_bitPlane, Iref_bitPlane, H, Ds, Mref, K, wts, keep, epsilon, lambda);
+        H = LukasKanade(I_bitPlane, Iref_bitPlane, H, Ds, Mref, K, wts, keep, epsilon, lambda, rect);
     else
         sig = 11;
         Iref = double(rgb2gray(v1))/255;

@@ -4,10 +4,11 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
     w = w-2;
 
     %Run the SD
-    lambda=lambda*w*h*eye(K); ds=zeros(1,8); err=inf;
+    lambda=lambda*w*h*eye(K); 
+	ds=zeros(1,8); 
     for i=1:100
-      s=svd(H); 
-      if(s(3)<=1e-4*s(1)), H=eye(3); return; end
+      %s=svd(H); 
+      %if(s(3)<=1e-4*s(1)), H=eye(3); return; end
       Ip=warpA( I, H, size(I) );
       dI=Ip-Iref; 
       dI0=abs(dI);

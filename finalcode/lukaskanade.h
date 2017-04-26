@@ -15,6 +15,66 @@ double * Initializeds()
 	return ds;
 }
 
+double computedsForOperation(cv::Mat &M, cv::Mat &Ds, cv::Mat &dI)
+{
+
+}
+
+double * Computeds(std::vector<cv::Mat> Ds, cv::Mat &M, cv::Mat &dI)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		cv::Mat_<double> D;
+		cv::multiply(Ds[i], M, D);
+
+		cv::Mat_<double> temp;
+		cv::multiply(dI, M, temp);
+
+		cv::Mat_<double> temp2;
+		cv::multiply(D, temp, temp2);
+		auto va1 = cv::sum(temp2);
+
+		cv::Mat_<double> temp3;
+		cv::multiply(D, D, temp3);
+		auto val2 = cv::sum(temp3);
+
+		//auto arr = 1 / (val2 + lambda)*temp;
+
+	}
+
+
+
+
+}
+
+cv::Mat ComputeError(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &Iref)
+{
+	cv::Mat_<double> dI;
+	auto errorPlanes = ComputeAbsoluteDifferenceBitPlanes(Ip, Iref);
+	for (int i = 0; i < errorPlanes.size(); i++)
+	{
+		if (i == 0)
+			dI = errorPlanes[i];
+		else
+			dI = dI + errorPlanes[i];
+	}
+	return dI;
+}
+
+cv::Mat ComputeSumedSubtraction(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &Iref)
+{
+	cv::Mat_<double> dI;
+	auto errorPlanes = SubtractBitPlanes(Ip, Iref);
+	for (int i = 0; i < errorPlanes.size(); i++)
+	{
+		if (i == 0)
+			dI = errorPlanes[i];
+		else
+			dI = dI + errorPlanes[i];
+	}
+	return dI;
+}
+
 bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
 				 std::vector<cv::Mat> Ds, cv::Mat Mref, 
 				 double *wts, double *keep, double epsilon, double lambdathreshold)
@@ -31,13 +91,13 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 	{
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
-		auto dI = SubtractBitPlanes(Ip, Iref);
-		auto dI0 = ComputeAbsoluteDifferenceBitPlanes(Ip, Iref);
+		auto dI = ComputeSumedSubtraction(Ip, Iref);
+		auto dI0 = ComputeError(Ip, Iref);
 
-		auto M = cv::Mat(Mref & ~CheckForNotNaNinPlanes(Ip));
+		cv::Mat_<double> M = cv::Mat(Mref & ~CheckForNotNaNinPlanes(Ip));
 		cv::Mat M0;
 		M.copyTo(M0);
-		
+
 		// To-Do Logical indexing
 
 	}

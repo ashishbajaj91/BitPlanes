@@ -6,6 +6,7 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
     %Run the SD
     lambda=lambda*w*h*eye(K); 
 	ds=zeros(1,8); 
+	err=inf;
     for i=1:100
       %s=svd(H); 
       %if(s(3)<=1e-4*s(1)), H=eye(3); return; end

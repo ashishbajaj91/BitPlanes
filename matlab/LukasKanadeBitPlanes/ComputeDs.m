@@ -6,20 +6,20 @@ function [Ds, Mref, K] = ComputeDs(Iref, keep, wts)
     k=0;
     if(keep(1))
         k=k+1; 
-        im = zeroes(h,w,l);
+        im = zeros(h,w,l);
         im(:,1:end-1,:)=Iref(:,2:end,:);
         Ds(:,:,1) = sum(im - Iref,3)/8;
     end
     if(keep(2))
         k=k+1; 
-        im = zeroes(h,w,l);
-        im(1:end-1,:,:)=Iref(2:end,:); 
+        im = zeros(h,w,l);
+        im(1:end-1,:,:)=Iref(2:end,:,:); 
         Ds(:,:,2) = sum(im - Iref,3)/8;
     end
     for i=k+1:K 
         %im = zeroes(h,w,l);
-        im = WarpBitPlane(Iref,H);
-        Ds(:,:,k) = sum(im - Iref,3)/8;
+        im = WarpBitPlane(Iref, Hs(:,:,i));
+        Ds(:,:,i) = sum(im - Iref,3)/8;
         %Ts(:,:,i) = warpA( Iref, Hs(:,:,i), size(Iref) );
     end
     %Ds=Ts-Iref(:,:,ones(1,K)); 

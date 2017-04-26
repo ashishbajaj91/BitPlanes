@@ -14,8 +14,8 @@ function [H] = LukasKanade(I, Iref, H, Ds, Mref, K, wts, keep, epsilon, lambda)
       Ip = WarpBitPlane(I,H);
       dI=Ip-Iref; 
       dI0=abs(dI);
-      dI = sum(dI,3);
-      dI0 = sum(dI0,3);
+      dI = sum(dI,3)/8;
+      dI0 = sum(dI0,3)/8;
       
       M=Mref & ~isnan(sum(Ip,3)); 
       M0=M; 

@@ -43,7 +43,8 @@ bool testGenerateBitplanes(cv::Mat &image)
 
 bool testimwarp(cv::Mat &image)
 {
-	auto img_src = convertToDouble(image);
+	auto gray_image = convertToGrayScale(image);
+	auto img_src = convertToDouble(gray_image);
 	Eigen::Matrix3d W(3, 3); 
 
 	W << 0.7	, -0.7	, 0,
@@ -86,7 +87,7 @@ bool testds2H()
 	return (H == Eigen::Matrix3d::Identity(3, 3));
 }
 
-bool testSubtract()
+bool testImageSubtract()
 {
 	cv::Mat_<uint8_t> a(10, 10), b(10, 10);
 
@@ -184,6 +185,18 @@ void RunTestDs2H()
 		std::cout << "Ds2H Test Failed" << std::endl;
 }
 
+void RunImageTestSubtract()
+{
+	if (testImageSubtract())
+	{
+		std::cout << "Image Subtraction Test Succeeded" << std::endl;
+	}
+	else
+	{
+		std::cout << "Image Subtraction Failed" << std::endl;
+	}
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -212,10 +225,7 @@ void RunTests(int argc, char** argv)
 	}
 
 	RunTestDs2H();
-	if (testSubtract())
-	{
-		std::cout << "Subtraction Tested" << std::endl;
-	}
+	RunImageTestSubtract();
 
 	if (testLucasKanade())
 	{

@@ -24,10 +24,8 @@ cv::Mat convertToGrayScale(cv::Mat &image)
 
 cv::Mat convertToDouble(cv::Mat &image, bool isbitplaneImage = false)
 {
-	cv::Mat gray_image = convertToGrayScale(image);
-
-	cv::Mat_<double> double_image(gray_image.rows, gray_image.cols);
-	gray_image.convertTo(double_image, CV_64F);
+	cv::Mat_<double> double_image;
+	image.convertTo(double_image, CV_64F);
 
 	if (!isbitplaneImage)
 		double_image /= 255.0;

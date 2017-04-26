@@ -7,15 +7,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "getParameters.h"
-
-void ComputeSVD(double *s, Eigen::Matrix3d H)
-{
-	Eigen::JacobiSVD<Eigen::Matrix3d> svd(H);
-	auto sing = svd.singularValues();
-	s[0] = sing[0];
-	s[1] = sing[1];
-	s[2] = sing[2];
-}
+#include "matrixFunctions.h"
 
 bool LukasKanade(cv::Mat_<double> I, cv::Mat_<double> Iref, Eigen::Matrix3d &H, cv::Mat_<double> Ds, cv::Mat_<int> Mref, int K, double *wts, double *keep)
 {

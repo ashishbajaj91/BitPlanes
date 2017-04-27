@@ -120,16 +120,6 @@ bool testImageSubtract()
 	return false;
 }
 
-bool testLucasKanade()
-{
-	Eigen::Matrix3d H;
-	H << 1, 0, 0,
-		0, 1, 0,
-		0, 0, 1;
-	
-	return true;
-}
-
 bool testReshapeDs(cv::Mat &image)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
@@ -253,11 +243,6 @@ void RunTests(int argc, char** argv)
 
 	RunTestDs2H();
 	RunImageTestSubtract();
-
-	if (testLucasKanade())
-	{
-		std::cout << "Lucas Kanade Tested" << std::endl;
-	}
 		
 	std::cout << "All Tests Done" << std::endl;
 }

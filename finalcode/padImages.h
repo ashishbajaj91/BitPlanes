@@ -24,7 +24,7 @@ void AddPaddingtoBitPlaneswithNaN(std::vector<cv::Mat> &bitPlanes, int top, int 
 {
 	for (int i = 0; i < bitPlanes.size(); ++i)
 	{
-		bitPlanes[i] = AddPaddingToImage(bitPlanes[i], 10, 10, 10, 10, fNaN);
+		bitPlanes[i] = AddPaddingToImage(bitPlanes[i], top, bottom, left, right, fNaN);
 	}
 }
 

@@ -42,7 +42,6 @@ T Interpolate(cv::Mat &image, imwarpdatatype  y, imwarpdatatype  x)
 	}
 }
 
-
 cv::Mat InitializeTargetImage(int nrows, int ncols, int imagetype, cv::Scalar scalar)
 {
 	return cv::Mat(nrows, ncols, imagetype, scalar);
@@ -76,4 +75,40 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int targetRows, int t
 	return target;
 }
 
+std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
+{
+	int imageWidth = imgSrc[0].cols;
+	int imageHeight = imgSrc[0].rows;
+
+	std::vector<cv::Mat> target;
+
+	for (int k = 0; k < imgSrc.size(); k++)
+	{
+		cv::Mat tarImage = InitializeTargetImage(targetRows, targetCols, imgSrc[0].type(), cv::Scalar(fNaN));
+		target.push_back(tarImage);
+	}
+	warpMat = warpMat.inverse().eval();
+	warpMat /= warpMat(2, 2);
+
+	Eigen::Vector3d X;      // Point in coordinate frame of source.
+	Eigen::Vector3d U;      // Point in coordinate frame of target.
+
+	for (int v = 0; v < targetRows; v++)
+	{
+		for (int u = 0; u < targetCols; u++)
+		{
+			U = Eigen::Vector3d(v - ((imageHeight + 1) / 2.0 - 1), u - ((imageWidth + 1) / 2.0 - 1), 1.0);
+			X = warpMat * U;
+			imwarpdatatype  y = X(0) / X(2);
+			imwarpdatatype  x = X(1) / X(2);
+			for (int k = 0; k < imgSrc.size(); k++)
+			{
+				imwarpdatatype  I2 = Interpolate<imwarpdatatype >(imgSrc[k], imwarpdatatype(y + ((imageHeight + 1) / 2.0 - 1)),
+					imwarpdatatype(x + ((imageWidth + 1) / 2.0) - 1));
+				target[k].at<imwarpdatatype>(v, u) = I2;
+			}
+		}
+	}
+	return target;
+}
 #endif

@@ -8,7 +8,7 @@
 
 double * getWeights(int nrows, int ncols)
 {
-	double wts[] = { 1.0f, 1.0f, 1.0204f, 0.03125f, 1.0313f, 0.0204f, 0.00055516f, 0.00055516f };
+	double wts[] = { 1.0, 1.0, 1.0204, 0.03125, 1.0313, 0.0204, 0.00055516, 0.00055516 };
 	double s = sqrt(double(nrows*ncols)) / 128.0;
 	wts[2] = pow(wts[2],(1/s));
 	wts[3] /= s;

@@ -15,7 +15,7 @@ bool SubtractImages(cv::Mat &result, cv::Mat &image1, cv::Mat &image2)
 {
 	if (image1.cols != image2.cols || image1.rows != image2.rows || image1.dims != image2.dims)
 		return false;
-	cv::subtract(image1, image2, result);
+	cv::subtract(image1, image2, result, cv::noArray(), CV_64F);
 	return true;
 }
 

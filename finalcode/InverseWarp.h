@@ -1,7 +1,3 @@
-//
-// Created by SHUN YAO on 4/24/17.
-//
-
 #ifndef INVERSEWARPCOORDS_INVERSEWARP_H_H
 #define INVERSEWARPCOORDS_INVERSEWARP_H_H
 #include <iostream>

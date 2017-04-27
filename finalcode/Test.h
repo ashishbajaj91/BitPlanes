@@ -2,7 +2,6 @@
 #define TEST_IS_INCLUDED
 
 #include <iostream>
-
 #include "readImage.h"
 #include "readVideo.h"
 #include "generateBitplanes.h"
@@ -10,6 +9,7 @@
 #include "ds2H.h"
 #include "ComputeDs.h"
 #include "lukaskanade.h"
+#include "imageFunctions.h"
 
 bool testReadImage(const cv::String &imagefilename)
 {
@@ -58,6 +58,19 @@ bool testimwarp(cv::Mat &image)
 	showImage(img_src, "original image");
 	showImage(target, "warped image");
 
+	auto bitplaneImage = ApplyWarpOnPlanes(generateBitPlanes(img_src), W, img_src.rows, img_src.cols);
+
+	for (int k = 0; k < 8; k++)
+	{
+		if (!bitplaneImage[k].data)
+			return false;
+
+		std::string winname = "bitplaneImage";
+		createNamedWindow((winname + std::to_string(k)).c_str());
+		auto temp = bitplaneImage[k];
+		showImage(temp, (winname + std::to_string(k)).c_str());
+	}
+
 	W = Eigen::Matrix3d::Identity(3, 3);
 	cv::Mat target2 = ApplyWarp(img_src, W, img_src.rows, img_src.cols);
 
@@ -100,20 +113,21 @@ bool testImageSubtract()
 			b(i, j) = j * 10 + i;
 		}
 	}
-
-	cv::Mat adoub = convertToDouble(a);
-	cv::Mat bdoub = convertToDouble(b);
 	
-	cv::Mat_<double> result;
-	if (SubtractImages(result, adoub, bdoub))
+	cv::Mat result;
+	if (SubtractImages(result, a, b))
 	{
 		for (int i = 0; i < 10; ++i)
 		{
 			for (int j = 0; j < 10; ++j)
 			{
-				std::cout << result(i, j) << " ";
+				if (i > j && result.at<double>(i, j) < 0.0)
+					return false;
+				else if (i < j && result.at<double>(i, j) > 0.0)
+					return false;
+				//std::cout << result.at<double>(i, j) << " ";
 			}
-			std::cout << std::endl;
+			//std::cout << std::endl;
 		}
 		return true;
 	}
@@ -131,6 +145,96 @@ bool testReshapeDs(cv::Mat &image)
 		&& rehaped_image.channels() == 1)
 		return true;
 	return false;
+}
+
+bool testCheckForNaN()
+{
+	cv::Mat_<double> a(10, 10);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			a(i, j) = i * 10 + j;
+		}
+	}
+
+	auto paddedImage = AddPaddingToImage(a, 1, 1, 1, 1, fNaN);
+	auto NaNMat = CheckForNaN(paddedImage);
+	for (int i = 0; i < 12; ++i)
+	{
+		for (int j = 0; j < 12; ++j)
+		{
+			if (i == 0 || j == 0 || i == 11 || j == 11)
+				if (NaNMat.at<double>(i, j) != 1.0)
+					return false;
+			//std::cout << NaNMat.at<double>(i, j) << " ";
+		}
+		//std::cout << std::endl;
+	}
+	return true;
+}
+
+bool testCheckForNotNaNinPlanes()
+{
+	cv::Mat_<double> a(10, 10);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			a(i, j) = i * 10 + j;
+		}
+	}
+
+	auto bitPlanes = generateBitPlanes(a);
+	bitPlanes[0] = AddPaddingToImage(bitPlanes[0], 1, 1, 1, 1, fNaN);
+	for (int i = 1; i < bitPlanes.size(); i++)
+	{
+		bitPlanes[i] = AddPaddingToImage(bitPlanes[i], 1, 1, 1, 1, 1);
+	}
+
+	auto NotNaNMat = CheckForNotNaNinPlanes(bitPlanes);
+	for (int i = 0; i < 12; ++i)
+	{
+		for (int j = 0; j < 12; ++j)
+		{
+			if (i == 0 || j == 0 || i == 11 || j == 11)
+				if (NotNaNMat.at<double>(i, j) != 0.0)
+					return false;
+			//std::cout << NotNaNMat.at<double>(i, j) << " ";
+		}
+		//std::cout << std::endl;
+	}
+	return true;
+}
+
+bool testApplyGaussianFilterOnPlanes()
+{
+	cv::Mat_<double> a(10, 10);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			if(i + j < 10)
+				a(i, j) = 1.0;
+			else
+				a(i, j) = 0.0;
+		}
+	}
+	auto b = ApplyGaussianFilter(a, 1.0);
+	if (b.data)
+		return true;
+	/*for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			std::cout << b.at<double>(i, j) << " ";
+		}
+		std::cout << std::endl;
+	}*/
+	return true;
 }
 
 void RunTestReadImage(cv::String filename)
@@ -209,6 +313,42 @@ void RunTestReshapeDs(cv::String filename)
 		std::cout << "Reshape Ds Test Failed" << std::endl;
 }
 
+void RunTestCheckForNaN()
+{
+	if(testCheckForNaN())
+	{
+		std::cout << "NaN Test Succeeded" << std::endl;
+	}
+	else
+	{
+		std::cout << "NaN Test Failed" << std::endl;
+	}
+}
+
+void RunTestCheckForNotNaNIinPlanes()
+{
+	if(testCheckForNotNaNinPlanes())
+	{
+		std::cout << "Not NaN in Plane Test Succeeded" << std::endl;
+	}
+	else
+	{
+		std::cout << "Not NaN in Plane Test Failed" << std::endl;
+	}
+}
+
+void RunTestApplyGaussianFilterOnPlanes()
+{
+	if(testApplyGaussianFilterOnPlanes())
+	{
+		std::cout << "Gaussian Filter Test Succeeded" << std::endl;
+	}
+	else
+	{
+		std::cout << "Gaussian Filter Test Failed" << std::endl;
+	}
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -243,7 +383,10 @@ void RunTests(int argc, char** argv)
 
 	RunTestDs2H();
 	RunImageTestSubtract();
-		
+	RunTestCheckForNaN();
+	RunTestCheckForNotNaNIinPlanes();
+	RunTestApplyGaussianFilterOnPlanes();
+
 	std::cout << "All Tests Done" << std::endl;
 }
 

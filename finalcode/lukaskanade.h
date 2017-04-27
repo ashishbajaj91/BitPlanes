@@ -60,7 +60,7 @@ void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[]
 
 	cv::Mat_<double> NotNaNDs = ReshapeImageToRow(M) * Ds;
 
-	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI));
+	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI))/64;
 	UpdatedsFromMat(dsMat, ds);
 }
 

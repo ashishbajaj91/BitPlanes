@@ -1,8 +1,8 @@
 close all;
 warning('off', 'all')
 
-v = VideoReader('../bitplanes_data/v9.mov');
-rect = [100, 190, 650, 900];
+v = VideoReader('../../../bitplanes_data/v8.mov');
+rect = [53, 240, 579, 900];
 
 figure; hold on;
 H = eye(3);
@@ -34,7 +34,7 @@ while hasFrame(v)
     end
     count = count + 1
     %Draws
-    if(mod(count,25)==1)
+    %if(mod(count,25)==1)
         DrawImage(v1, rect, H);
-    end
+    %end
 end

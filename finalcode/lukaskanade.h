@@ -9,42 +9,59 @@
 #include "getParameters.h"
 #include "matrixFunctions.h"
 
-double * Initializeds()
+void Initializeds(double ds[8])
 {
-	double ds[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	return ds;
+	for (int i = 0; i < 8; i++)
+		ds = 0;
 }
 
-double computedsForOperation(cv::Mat &M, cv::Mat &Ds, cv::Mat &dI)
+cv::Mat ReshapeImageToColumn(cv::Mat &image)
 {
-
+	cv::Mat result = image.reshape(image.channels(), image.rows * image.cols);
+	return result;
 }
 
-double * Computeds(std::vector<cv::Mat> Ds, cv::Mat &M, cv::Mat &dI)
+cv::Mat ReshapeImageToRow(cv::Mat &image)
+{
+	cv::Mat result = image.reshape(image.channels(), 1);
+	return result;
+}
+
+cv::Mat Transpose(cv::Mat &image)
+{
+	cv::Mat result;
+	cv::transpose(image, result);
+	return result;
+}
+
+cv::Mat InnerProduct(cv::Mat mat1, cv::Mat mat2)
+{
+	return Transpose(mat1) * (mat2);
+}
+
+void UpdatedsFromMat(cv::Mat &dsMat, double ds[])
 {
 	for (int i = 0; i < 8; i++)
 	{
-		cv::Mat_<double> D;
-		cv::multiply(Ds[i], M, D);
-
-		cv::Mat_<double> temp;
-		cv::multiply(dI, M, temp);
-
-		cv::Mat_<double> temp2;
-		cv::multiply(D, temp, temp2);
-		auto va1 = cv::sum(temp2);
-
-		cv::Mat_<double> temp3;
-		cv::multiply(D, D, temp3);
-		auto val2 = cv::sum(temp3);
-
-		//auto arr = 1 / (val2 + lambda)*temp;
-
+		if (dsMat.at<double>(i, 0) != dsMat.at<double>(i, 0))
+		{
+			Initializeds(ds);
+			return;
+		}
+		ds[i] = dsMat.at<double>(i, 0);
 	}
+}
 
+void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[])
+{
+	cv::Mat_<double> NotNaNdI;
+	cv::multiply(dI, M, NotNaNdI);
+	NotNaNdI = ReshapeImageToColumn(NotNaNdI);
 
+	cv::Mat_<double> NotNaNDs = ReshapeImageToRow(M) * Ds;
 
-
+	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI));
+	UpdatedsFromMat(dsMat, ds);
 }
 
 cv::Mat ComputeError(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &Iref)
@@ -75,17 +92,41 @@ cv::Mat ComputeSumedSubtraction(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &
 	return dI;
 }
 
+void UpdateDsWithKeep(bool * keep, double ds[])
+{
+	for (int i = 0; i < 8; i++)
+	{
+		if (keep[i] == false)
+			ds[i] = 0;
+	}
+}
+
+double ComputeSummedError(cv::Mat &dI0, cv::Mat &M)
+{
+	cv::Mat result;
+	cv::multiply(dI0, M, result);
+	return cv::sum(result)[0];
+}
+
+double ComputeMeanError(cv::Mat &dI0, cv::Mat &M)
+{
+	cv::Mat result;
+	cv::multiply(dI0, M, result);
+	return cv::mean(result)[0];
+}
+
 bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
-				 std::vector<cv::Mat> Ds, cv::Mat Mref, 
-				 double *wts, double *keep, double epsilon, double lambdathreshold)
+				 cv::Mat &Ds, cv::Mat Mref, 
+				 double *wts, bool *keep, double epsilon, double lambdathreshold)
 {
 	double error = std::numeric_limits<double>::infinity();
-	double * ds = Initializeds();
+	double ds[8];
+	Initializeds(ds);
 
 	double h = I[0].rows - 2;
 	double w = I[0].cols - 2;
 
-	cv::Mat_<double> lambda = lambdathreshold*cv::Mat_<double>::eye(8,8);
+	cv::Mat_<double> lambda = h*w*lambdathreshold*cv::Mat_<double>::eye(8,8);
 
 	for (int i = 0; i < 100; ++i)
 	{
@@ -94,12 +135,14 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
 		auto dI0 = ComputeError(Ip, Iref);
 
-		cv::Mat_<double> M = cv::Mat(Mref & ~CheckForNotNaNinPlanes(Ip));
-		cv::Mat M0;
-		M.copyTo(M0);
-
-		// To-Do Logical indexing
-
+		cv::Mat_<double> M = cv::Mat(Mref & CheckForNotNaNinPlanes(Ip));
+		Computeds(Ds, M, dI, lambda, ds);
+		UpdateDsWithKeep(keep, ds);
+		H = H * Hs2H(ds2Hs(ds, wts));
+		auto error0 = error;
+		error = ComputeMeanError(dI0, M);
+		if ((error0 - error) < epsilon)
+			break;
 	}
 
 	return true;

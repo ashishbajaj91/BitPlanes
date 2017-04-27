@@ -30,10 +30,10 @@ double getLambda()
 	return double(1e-6);
 }
 
-double * getKeep(std::string method)
+bool * getKeep(std::string method)
 {
-	double keep[] = {0.0, 0.0, 0.0, 0.0, 
-					 0.0, 0.0, 0.0, 0.0};
+	bool keep[] = {0, 0, 0, 0, 
+					 0, 0, 0, 0};
 
 	if (method == "transation")
 	{
@@ -86,11 +86,11 @@ double * getKeep(std::string method)
 	return keep;
 }
 
-int getNoOfParameters(double keep[])
+int getNoOfParameters(bool keep[])
 {
 	int nParameters = 0;
 	for (int i = 0; i < 8; i++)
-		if (keep[i] > 1e-6)
+		if (keep[i] == true)
 			nParameters++;
 }
 

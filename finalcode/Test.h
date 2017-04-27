@@ -130,6 +130,19 @@ bool testLucasKanade()
 	return true;
 }
 
+bool testReshapeDs(cv::Mat &image)
+{
+	cv::Mat gray_image = convertToGrayScale(image);
+	cv::Mat double_image = convertToDouble(gray_image);
+	auto bitplaneImage = generateBitPlanes(double_image);
+	auto rehaped_image = ReshapeDs(bitplaneImage);
+
+	if (rehaped_image.cols == bitplaneImage.size() && rehaped_image.rows == bitplaneImage[0].rows * bitplaneImage[0].cols
+		&& rehaped_image.channels() == 1)
+		return true;
+	return false;
+}
+
 void RunTestReadImage(cv::String filename)
 {
 	if (testReadImage(filename))
@@ -196,6 +209,16 @@ void RunImageTestSubtract()
 	}
 }
 
+void RunTestReshapeDs(cv::String filename)
+{
+	cv::Mat image;
+	readImage(image, filename);
+	if (testReshapeDs(image))
+		std::cout << "Reshape Ds Test Succeeded" << std::endl;
+	else
+		std::cout << "Reshape Ds Test Failed" << std::endl;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl;
@@ -216,6 +239,11 @@ void RunTests(int argc, char** argv)
 		RunTestPadImage(argv[1]);
 		cv::waitKey(0);
 		destroyWindow("All");
+
+		RunTestReshapeDs(argv[1]);
+		cv::waitKey(0);
+		destroyWindow("All");
+
 	}
 	if (argc > 2)
 	{

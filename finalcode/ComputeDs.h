@@ -36,6 +36,8 @@ std::vector<cv::Mat> SubtractBitPlanes(std::vector<cv::Mat> &image1 , std::vecto
 			std::cout << "The image data is incorrect for subtraction" << std::endl;
 		result.push_back(diff);
 	}
+
+	return result;
 }
 
 std::vector<cv::Mat> ComputeAbsoluteDifferenceBitPlanes(std::vector<cv::Mat> &image1, std::vector<cv::Mat> &image2)
@@ -48,6 +50,8 @@ std::vector<cv::Mat> ComputeAbsoluteDifferenceBitPlanes(std::vector<cv::Mat> &im
 			std::cout << "The image data is incorrect for subtraction" << std::endl;
 		result.push_back(diff);
 	}
+
+	return result;
 }
 
 cv::Mat ComputeBitPlaneGradient(std::vector<cv::Mat> &image1, std::vector<cv::Mat> &image2)
@@ -123,12 +127,24 @@ std::vector<cv::Mat> ApplyWarpToBitPlanes(std::vector<cv::Mat> &Iref, Eigen::Mat
 cv::Mat ComputeGradientPostWarping(std::vector<cv::Mat> &Iref, Eigen::Matrix3d H)
 {
 	auto WarpedPlanes = ApplyWarpToBitPlanes(Iref, H);
-
 	return ComputeBitPlaneGradient(WarpedPlanes, Iref);
 }
 
+cv::Mat ReshapeDs(std::vector<cv::Mat> &WarpedGradients)
+{
+	cv::Mat reshaped_gradients;
+	for (int i = 0; i < WarpedGradients.size(); i++)
+	{
+		if (i == 0)
+			reshaped_gradients = WarpedGradients[i].reshape(1, WarpedGradients[i].rows* WarpedGradients[i].cols);
+		else
+			cv::hconcat(reshaped_gradients, WarpedGradients[i].reshape(1, WarpedGradients[i].rows* WarpedGradients[i].cols), reshaped_gradients);
+	}
 
-std::vector<cv::Mat> ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], double wts[])
+	return reshaped_gradients;
+}
+
+cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], double wts[])
 {	
 	std::vector<cv::Mat> WarpGradients; //= InitializeZeroGradients(Iref[0]);
 	int counter = 0;
@@ -158,6 +174,7 @@ std::vector<cv::Mat> ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double 
 		cv::Mat warp_grap = ComputeGradientPostWarping(Iref, Hs[counter]);
 		WarpGradients.push_back(warp_grap);
 	}
+	return ReshapeDs(WarpGradients);
 }
 
 #endif

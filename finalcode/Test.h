@@ -290,6 +290,71 @@ bool testInverseWarp(const cv::String &imagefilename)
 	return true;
 }
 
+bool testReshapeImageFunction()
+{
+	cv::Mat_<double> a(4, 4);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if ( j < 2)
+				a(i, j) = 1.0;
+			else
+				a(i, j) = 0.0;
+			//std::cout << a.at<double>(i, j);
+		}
+		//std::cout << std::endl;
+	}
+	auto reshaped_image_col = ReshapeImageToColumn(a);
+	//for (int i = 0; i < 16; ++i)
+	//{
+	//	std::cout << reshaped_image_col.at<double>(i,0);
+	//}
+
+	if (a.channels() != reshaped_image_col.channels() || reshaped_image_col.rows != a.rows * a.cols && reshaped_image_col.cols != 1)
+		return false;
+
+	auto reshaped_image_row = ReshapeImageToRow(a);
+	//for (int i = 0; i < 16; ++i)
+	//{
+	//	std::cout << reshaped_image_row.at<double>(0, i);
+	//}
+
+	if (a.channels() != reshaped_image_row.channels() || reshaped_image_row.rows != 1 && reshaped_image_row.cols != a.rows * a.cols)
+		return false;
+	return true;
+}
+
+bool testTranspose(const cv::String &imagefilename)
+{
+	cv::Mat image;
+	readImage(image, imagefilename);
+	auto transposed_image = Transpose(image);
+
+	showImage(image, "original image");
+	showImage(transposed_image, "tranposed image");
+
+	if (transposed_image.data)
+		return true;
+	return false;
+}
+
+bool testInnerProductImage(const cv::String &imagefilename)
+{
+	cv::Mat image;
+	readImage(image, imagefilename);
+	cv::Mat grayimage = convertToGrayScale(image);
+	cv::Mat double_image = convertToDouble(grayimage);
+
+	cv::Mat inner_product_image = InnerProduct(double_image,double_image);
+	//showImage(double_image, "Grayed Double image");
+	//showImage(inner_product_image, "inner product image");
+	if (inner_product_image.data && inner_product_image.cols == double_image.cols && inner_product_image.rows == double_image.cols)
+		return true;
+	return false;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl << std::endl;
@@ -318,6 +383,15 @@ void RunTests(int argc, char** argv)
 		RunTest(testInverseWarp(argv[1]), "Warped Coordinates");
 		cv::waitKey(0);
 		destroyWindow("All");
+
+		RunTest(testTranspose(argv[1]), "Image Transpose");
+		cv::waitKey(0);
+		destroyWindow("All");
+		
+		RunTest(testInnerProductImage(argv[1]), "Image Inner Product");
+		cv::waitKey(0);
+		destroyWindow("All");
+
 	}
 	if (argc > 2)
 	{
@@ -329,6 +403,7 @@ void RunTests(int argc, char** argv)
 	RunTest(testCheckForNaN(), "Check for NaN");
 	RunTest(testCheckForNotNaNinPlanes(), "Not NaN in Plane");
 	RunTest(testApplyGaussianFilterOnPlanes(), "Gaussian Filter on Plane");
+	RunTest(testReshapeImageFunction(), "Reshape Image");
 	std::cout << std::endl << "All Tests Done" << std::endl;
 }
 

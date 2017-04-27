@@ -282,7 +282,7 @@ bool testInverseWarp(const cv::String &imagefilename)
 	int out_size[] = { img_src.rows, img_src.cols };
 	cv::Mat target = ApplyWarp(img_src, W, img_src.rows, img_src.cols);
 
-	warpCoords(warpedCoords, inCoords, W, img_src.cols, img_src.rows, false);
+	warpCoords(warpedCoords, inCoords, W, img_src.cols, img_src.rows, true);
 
 	showImage(drawBoundingBox(inCoords, img_src), "original image");
 	showImage(drawBoundingBox(warpedCoords, target), "warped image");

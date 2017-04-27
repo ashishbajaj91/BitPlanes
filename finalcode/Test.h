@@ -8,7 +8,7 @@
 #include "imwarp.h"
 #include "ds2H.h"
 #include "ComputeDs.h"
-#include "lukaskanade.h"
+#include "lucaskanade.h"
 #include "imageFunctions.h"
 #include "warpCoordinates.h"
 
@@ -393,11 +393,11 @@ void RunTests(int argc, char** argv)
 		destroyWindow("All");
 
 	}
-	if (argc > 2)
+	/*if (argc > 2)
 	{
 		RunTest(testReadVideo(argv[2]), "Video Read");
 		destroyWindow("All");
-	}
+	}*/
 	RunTest(testds2H(), "Ds2H");
 	RunTest(testImageSubtract(), "Image Subtract");
 	RunTest(testCheckForNaN(), "Check for NaN");

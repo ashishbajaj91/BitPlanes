@@ -8,7 +8,7 @@ std::vector<cv::Mat> InitializeChannels(cv::Mat &grayimage)
 	std::vector<cv::Mat> image_channels;
 	for (int i = 0; i < 8; i++)
 	{
-		cv::Mat bitplanesImage(grayimage);
+		cv::Mat bitplanesImage = cv::Mat(grayimage.rows, grayimage.cols, grayimage.type(), 0.0);
 		image_channels.push_back(bitplanesImage);
 	}
 	return image_channels;

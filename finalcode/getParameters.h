@@ -6,9 +6,17 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
-double * getWeights(int nrows, int ncols)
+void getWeights(int nrows, int ncols, double wts[8])
 {
-	double wts[] = { 1.0, 1.0, 1.0204, 0.03125, 1.0313, 0.0204, 0.00055516, 0.00055516 };
+	wts[0] = 1.0;
+	wts[1] = 1.0;
+	wts[2] = 1.0204;
+	wts[3] = 0.03125;
+	wts[4] = 1.0313;
+	wts[5] = 0.0204;
+	wts[6] = 0.00055516;
+	wts[7] = 0.00055516;
+
 	double s = sqrt(double(nrows*ncols)) / 128.0;
 	wts[2] = pow(wts[2],(1/s));
 	wts[3] /= s;
@@ -16,8 +24,6 @@ double * getWeights(int nrows, int ncols)
 	wts[5] /= s;
 	wts[6] /= (s*s);
 	wts[7] /= (s*s);
-
-	return wts;
 }
 
 double getEpsilon()

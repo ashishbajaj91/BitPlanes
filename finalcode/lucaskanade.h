@@ -1,5 +1,5 @@
-#ifndef LUKASKANADE_IS_INCLUDED
-#define LUKASKANADE_IS_INCLUDED
+#ifndef LUCASKANADE_IS_INCLUDED
+#define LUCASKANADE_IS_INCLUDED
 
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -58,7 +58,8 @@ void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[]
 	cv::multiply(dI, M, NotNaNdI);
 	NotNaNdI = ReshapeImageToColumn(NotNaNdI);
 
-	cv::Mat_<double> NotNaNDs = ReshapeImageToRow(M) * Ds;
+	cv::Mat_<double> NotNaNDs;
+	cv::multiply(AddPaddingToImage(ReshapeImageToColumn(M), 0, 0, 0, Ds.cols - 1) , Ds, NotNaNDs);
 
 	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI))/64;
 	UpdatedsFromMat(dsMat, ds);
@@ -133,14 +134,19 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
+
 		auto dI0 = ComputeError(Ip, Iref);
 
-		cv::Mat_<double> M = cv::Mat(Mref & CheckForNotNaNinPlanes(Ip));
+		cv::Mat M = cv::Mat_<double>(Mref & CheckForNotNaNinPlanes(Ip));
+
 		Computeds(Ds, M, dI, lambda, ds);
+
 		UpdateDsWithKeep(keep, ds);
+
 		H = H * Hs2H(ds2Hs(ds, wts));
 		auto error0 = error;
 		error = ComputeMeanError(dI0, M);
+		std::cout << "Current Error:" << error << std::endl;
 		if ((error0 - error) < epsilon)
 			break;
 	}

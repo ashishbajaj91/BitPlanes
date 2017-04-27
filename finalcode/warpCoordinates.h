@@ -1,5 +1,6 @@
-#ifndef WARPCOORDINATES_INVERSEWARP_H_H
-#define WARPCOORDINATES_INVERSEWARP_H_H
+#ifndef WARPCOORDINATES_IS_INCLUDED
+#define WARPCOORDINATES_IS_INCLUDED
+
 #include <iostream>
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>

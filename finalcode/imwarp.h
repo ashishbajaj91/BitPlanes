@@ -1,5 +1,5 @@
-#ifndef WARPIMAGE_WARPA_H
-#define WARPIMAGE_WARPA_H
+#ifndef IMWARP_IS_INCLUDED
+#define IMWARP_IS_INCLUDED
 
 #include <iostream>
 #include <Eigen/Dense>

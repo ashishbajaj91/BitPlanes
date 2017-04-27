@@ -26,7 +26,7 @@ bool ComputeAbsoluteDifference(cv::Mat &result, cv::Mat &image1, cv::Mat &image2
 	return true;
 }
 
-std::vector<cv::Mat_<double>> SubtractBitPlanes(std::vector<cv::Mat_<double>> &image1 , std::vector<cv::Mat_<double>> &image2)
+std::vector<cv::Mat> SubtractBitPlanes(std::vector<cv::Mat> &image1 , std::vector<cv::Mat> &image2)
 {
 	std::vector<cv::Mat> result;
 	for (int i = 0; i < image1.size(); i++)
@@ -38,7 +38,7 @@ std::vector<cv::Mat_<double>> SubtractBitPlanes(std::vector<cv::Mat_<double>> &i
 	}
 }
 
-std::vector<cv::Mat_<double>> ComputeAbsoluteDifferenceBitPlanes(std::vector<cv::Mat> &image1, std::vector<cv::Mat> &image2)
+std::vector<cv::Mat> ComputeAbsoluteDifferenceBitPlanes(std::vector<cv::Mat> &image1, std::vector<cv::Mat> &image2)
 {
 	std::vector<cv::Mat> result;
 	for (int i = 0; i < image1.size(); i++)
@@ -50,7 +50,7 @@ std::vector<cv::Mat_<double>> ComputeAbsoluteDifferenceBitPlanes(std::vector<cv:
 	}
 }
 
-cv::Mat ComputeBitPlaneGradient(std::vector<cv::Mat_<double>> &image1, std::vector<cv::Mat_<double>> &image2)
+cv::Mat ComputeBitPlaneGradient(std::vector<cv::Mat> &image1, std::vector<cv::Mat> &image2)
 {
 	auto result = SubtractBitPlanes(image1, image2);
 	cv::Mat gradient_avg;
@@ -65,13 +65,13 @@ cv::Mat ComputeBitPlaneGradient(std::vector<cv::Mat_<double>> &image1, std::vect
 	return gradient_avg;
 }
 
-std::vector<cv::Mat_<double>> InitializeZeroGradients(cv::Mat image)
+std::vector<cv::Mat> InitializeZeroGradients(cv::Mat image)
 {
 	int rows = image.rows;
 	int cols = image.cols;
 	int type = image.type();
 
-	std::vector<cv::Mat_<double>> WarpGradients;
+	std::vector<cv::Mat> WarpGradients;
 	for (int i = 0; i < 8; i++)
 	{
 		cv::Mat T = cv::Mat(rows, cols, type, cvScalar(0.));
@@ -81,9 +81,9 @@ std::vector<cv::Mat_<double>> InitializeZeroGradients(cv::Mat image)
 	return WarpGradients;
 }
 
-cv::Mat ComputeGradientInX(std::vector<cv::Mat_<double>> &Iref)
+cv::Mat ComputeGradientInX(std::vector<cv::Mat> &Iref)
 {
-	std::vector <cv::Mat_<double>> image1, image2;
+	std::vector <cv::Mat> image1, image2;
 	
 	for (int i = 0; i < Iref.size(); i++)
 	{
@@ -96,9 +96,9 @@ cv::Mat ComputeGradientInX(std::vector<cv::Mat_<double>> &Iref)
 	return ComputeBitPlaneGradient(image1, image2);
 }
 
-cv::Mat ComputeGradientInY(std::vector<cv::Mat_<double>> &Iref)
+cv::Mat ComputeGradientInY(std::vector<cv::Mat> &Iref)
 {
-	std::vector <cv::Mat_<double>> image1, image2;
+	std::vector <cv::Mat> image1, image2;
 
 	for (int i = 0; i < Iref.size(); i++)
 	{
@@ -109,9 +109,9 @@ cv::Mat ComputeGradientInY(std::vector<cv::Mat_<double>> &Iref)
 	}
 	return ComputeBitPlaneGradient(image1, image2);
 }
-std::vector<cv::Mat_<double>> ApplyWarpToBitPlanes(std::vector<cv::Mat_<double>> &Iref, Eigen::Matrix3d &H)
+std::vector<cv::Mat> ApplyWarpToBitPlanes(std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H)
 {
-	std::vector<cv::Mat_<double>> WarpedPlanes;
+	std::vector<cv::Mat> WarpedPlanes;
 	for (int i = 0; i < Iref.size(); i++)
 	{
 		cv::Mat_<double> Ip = ApplyWarp(Iref[i], H, Iref[i].rows, Iref[i].cols);
@@ -120,7 +120,7 @@ std::vector<cv::Mat_<double>> ApplyWarpToBitPlanes(std::vector<cv::Mat_<double>>
 	return WarpedPlanes;
 }
 
-cv::Mat ComputeGradientPostWarping(std::vector<cv::Mat_<double>> &Iref, Eigen::Matrix3d H)
+cv::Mat ComputeGradientPostWarping(std::vector<cv::Mat> &Iref, Eigen::Matrix3d H)
 {
 	auto WarpedPlanes = ApplyWarpToBitPlanes(Iref, H);
 
@@ -128,13 +128,13 @@ cv::Mat ComputeGradientPostWarping(std::vector<cv::Mat_<double>> &Iref, Eigen::M
 }
 
 
-std::vector<cv::Mat_<double>> ComputeGradientsForWarp(std::vector<cv::Mat_<double>> &Iref, double keep[], double wts[])
+std::vector<cv::Mat> ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], double wts[])
 {	
 	std::vector<cv::Mat> WarpGradients; //= InitializeZeroGradients(Iref[0]);
 	int counter = 0;
 
-	double ds[] = { -1, -1, -1, -1,
-					 -1, -1, -1, -1 };
+	double ds[] = { 1, 1, 1, 1,
+					 1, 1, 1, 1 };
 
 	auto Hs = ds2Hs(ds, wts);
 

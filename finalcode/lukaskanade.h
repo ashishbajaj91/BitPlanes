@@ -9,18 +9,18 @@
 #include "getParameters.h"
 #include "matrixFunctions.h"
 
-inline double * Initializeds()
+double * Initializeds()
 {
 	double ds[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	return ds;
 }
 
-double ComputeDsForOperation(cv::Mat &M, cv::Mat &Ds, cv::Mat &dI)
+double computedsForOperation(cv::Mat &M, cv::Mat &Ds, cv::Mat &dI)
 {
 
 }
 
-double *ComputeDs(std::vector<cv::Mat> Ds, cv::Mat &M, cv::Mat &dI)
+double * Computeds(std::vector<cv::Mat> Ds, cv::Mat &M, cv::Mat &dI)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -41,6 +41,9 @@ double *ComputeDs(std::vector<cv::Mat> Ds, cv::Mat &M, cv::Mat &dI)
 		//auto arr = 1 / (val2 + lambda)*temp;
 
 	}
+
+
+
 
 }
 
@@ -72,8 +75,8 @@ cv::Mat ComputeSumedSubtraction(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &
 	return dI;
 }
 
-bool LukasKanade(std::vector<cv::Mat_<double>> &I, std::vector<cv::Mat_<double>> &Iref, Eigen::Matrix3d &H,
-				 std::vector<cv::Mat_<double>> Ds, cv::Mat Mref,
+bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
+				 std::vector<cv::Mat> Ds, cv::Mat Mref, 
 				 double *wts, double *keep, double epsilon, double lambdathreshold)
 {
 	double error = std::numeric_limits<double>::infinity();
@@ -84,7 +87,7 @@ bool LukasKanade(std::vector<cv::Mat_<double>> &I, std::vector<cv::Mat_<double>>
 
 	cv::Mat_<double> lambda = lambdathreshold*cv::Mat_<double>::eye(8,8);
 
-	for (int iter = 0; iter < 100; ++iter)
+	for (int i = 0; i < 100; ++i)
 	{
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
@@ -95,6 +98,7 @@ bool LukasKanade(std::vector<cv::Mat_<double>> &I, std::vector<cv::Mat_<double>>
 		cv::Mat M0;
 		M.copyTo(M0);
 
+		// To-Do Logical indexing
 
 	}
 

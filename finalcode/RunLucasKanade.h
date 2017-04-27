@@ -6,33 +6,42 @@
 #include "readVideo.h"
 #include "ComputeDs.h"
 #include "generateBitplanes.h"
+#include "imageFunctions.h"
 
-bool RunLucasKanade(int argc, char** argv)
+bool ValidateInputs(int argc, char** argv, cv::VideoCapture &capVideo)
 {
 	if (argc < 2)
 	{
 		std::cout << "Incorrect arguments." << std::endl;
-		return false; 
+		return false;
 	}
-	cv::VideoCapture capVideo;
 	if (!readVideoFile(capVideo, argv[1]))
 	{
 		std::cout << "Could not read video." << std::endl;
 		return false;
 	}
+	return true;
+}
 
+bool RunLucasKanade(int argc, char** argv)
+{
+	cv::VideoCapture capVideo;
+
+	if (!ValidateInputs(argc, argv, capVideo))
+		return false;
+	
 	// Create Rect object ???
 	cv::Mat_<double> imageFrame;
 	int count = 0;
 
 	// Allocate memory for workspace variables :
-	int sig = 11;
+	double sigma = 11;
 	cv::Mat_<double> I;
-	std::vector<cv::Mat_<double>> Iref_bitPlane, I_bitPlane;
+	std::vector<cv::Mat> Iref_bitPlane, I_bitPlane;
 
-	double *keep, epsilon, lambda, *weights;
-	int K = 8;
-	std::vector<cv::Mat_<double>> Ds;
+	double epsilon = getEpsilon(), lambda = getLambda(), *weights;
+	bool * keep = getKeep("projective");
+	cv::Mat_<double> Ds;
 	cv::Mat_<double> Mref;
 
 	Eigen::Matrix3d H = Eigen::Matrix3d::Identity();
@@ -43,33 +52,17 @@ bool RunLucasKanade(int argc, char** argv)
 		if (count == 0)
 		{
 			Iref_bitPlane = generateBitPlanes(I);
+			ApplyGaussianFilterOnPlanes(Iref_bitPlane, sigma);
+			AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
 
-			// Apply Gaussian Filter ???
-
-			for (int i = 0; i < Iref_bitPlane.size(); ++i)
-			{
-				Iref_bitPlane[i] = AddPaddingToImage(Iref_bitPlane[i], 10, 10, 10, 10, 0);
-			}
-
-			epsilon = getEpsilon();
-			lambda = getLambda();
-			keep = getKeep("projective");
-			weights = getWeights(imageFrame.rows,imageFrame.cols);
-
-			// What about Mref ???
-			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights);
+			weights = getWeights(Iref_bitPlane[0].rows, Iref_bitPlane[0].cols);
+			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights, Mref);
 		}
 		else
 		{
 			I_bitPlane = generateBitPlanes(I);
-
-			// Apply Gaussian Filter ???
-			// Same or different Padding ???
-
-			for (int i = 0; i < I_bitPlane.size(); ++i)
-			{
-				I_bitPlane[i] = AddPaddingToImage(I_bitPlane[i], 10, 10, 10, 10, 0);
-			}
+			ApplyGaussianFilterOnPlanes(I_bitPlane, sigma);
+			AddPaddingtoBitPlaneswithNaN(I_bitPlane, 2, 2, 2, 2);
 
 			if (!LukasKanade(I_bitPlane, Iref_bitPlane, H, Ds, Mref, weights, keep, epsilon, lambda))
 			{
@@ -77,7 +70,6 @@ bool RunLucasKanade(int argc, char** argv)
 				return false;
 			}
 		}
-
 		++count;
 
 		// Show imageFrame with rectangle ???

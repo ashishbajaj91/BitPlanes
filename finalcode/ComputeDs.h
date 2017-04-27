@@ -9,6 +9,7 @@
 #include "imwarp.h"
 #include "padImages.h"
 #include "ds2H.h"
+#include "matrixFunctions.h"
 
 bool SubtractImages(cv::Mat &result, cv::Mat &image1, cv::Mat &image2)
 {
@@ -144,7 +145,7 @@ cv::Mat ReshapeDs(std::vector<cv::Mat> &WarpedGradients)
 	return reshaped_gradients;
 }
 
-cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], double wts[])
+cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, bool keep[], double wts[], cv::Mat &Mref)
 {	
 	std::vector<cv::Mat> WarpGradients; //= InitializeZeroGradients(Iref[0]);
 	int counter = 0;
@@ -155,14 +156,14 @@ cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], doubl
 	auto Hs = ds2Hs(ds, wts);
 
 	//Gradient in X direction
-	if (keep[0] > 1e-6)
+	if (keep[0] == true)
 	{
 		cv::Mat GradientX = ComputeGradientInX(Iref);
 		WarpGradients.push_back(AddPaddingToImage(GradientX, 0, 0, 0, 1, 0));
 		counter++;
 	}
 	//Gradient in Y direction
-	if (keep[1] > 1e-6)
+	if (keep[1] == true)
 	{
 		cv::Mat GradientY = ComputeGradientInY(Iref);
 		WarpGradients.push_back(AddPaddingToImage(GradientY, 0, 1, 0, 0, 0));
@@ -174,7 +175,8 @@ cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, double keep[], doubl
 		cv::Mat warp_grap = ComputeGradientPostWarping(Iref, Hs[counter]);
 		WarpGradients.push_back(warp_grap);
 	}
+
+	Mref = CheckForNotNaNinPlanes(WarpGradients);
 	return ReshapeDs(WarpGradients);
 }
-
 #endif

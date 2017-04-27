@@ -83,11 +83,6 @@ bool RunLucasKanade(int argc, char** argv)
 		++count;
 		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);
 		showImage(drawBoundingBox(warpedCoords, I), "Current Frame");
-		char chCheckForEscKey = cv::waitKey(0);
-		if (chCheckForEscKey == 27)
-		{
-			break;
-		}
 	}
 
 	destroyWindow("All");

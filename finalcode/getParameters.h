@@ -20,12 +20,12 @@ double * getWeights(int nrows, int ncols)
 	return wts;
 }
 
-double getEpsilon()
+inline double getEpsilon()
 {
 	return double(1e-3);
 }
 
-double getLambda()
+inline double getLambda()
 {
 	return double(1e-6);
 }
@@ -86,12 +86,14 @@ double * getKeep(std::string method)
 	return keep;
 }
 
-int getNoOfParameters(double keep[])
+inline int getNoOfParameters(double keep[])
 {
 	int nParameters = 0;
 	for (int i = 0; i < 8; i++)
+	{
 		if (keep[i] > 1e-6)
 			nParameters++;
+	}
 }
 
 #endif

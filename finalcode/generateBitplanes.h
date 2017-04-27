@@ -3,9 +3,9 @@
 
 #include "padImages.h"
 
-std::vector<cv::Mat> InitializeChannels(cv::Mat &grayimage)
+std::vector<cv::Mat_<double>> InitializeChannels(cv::Mat &grayimage)
 {
-	std::vector<cv::Mat> image_channels;
+	std::vector<cv::Mat_<double>> image_channels;
 	for (int i = 0; i < 8; i++)
 	{
 		cv::Mat bitplanesImage(grayimage);
@@ -14,10 +14,10 @@ std::vector<cv::Mat> InitializeChannels(cv::Mat &grayimage)
 	return image_channels;
 }
 
-std::vector<cv::Mat> generateBitPlanes(cv::Mat &grayimage)
+std::vector<cv::Mat_<double>> generateBitPlanes(cv::Mat &grayimage)
 {
 	cv::Mat grayImageWithBorder = AddPaddingToImage(grayimage, 1, 1, 1, 1);
-	std::vector<cv::Mat> image_channels = InitializeChannels(grayimage);
+	std::vector<cv::Mat_<double>> image_channels = InitializeChannels(grayimage);
 
 	for (int i = 1; i<grayImageWithBorder.rows - 1; i++) 
 	{

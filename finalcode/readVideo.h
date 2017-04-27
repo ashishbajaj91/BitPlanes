@@ -7,27 +7,27 @@
 
 #include "readImage.h"
 
-bool readVideoFile(cv::VideoCapture &capVideo, const cv::String &filename)
+inline bool readVideoFile(cv::VideoCapture &capVideo, const cv::String &filename)
 {
 	return (capVideo.open(filename) && capVideo.isOpened() && capVideo.get(CV_CAP_PROP_FRAME_COUNT) >= 1) ;
 }
 
-unsigned int getTotalFrames(cv::VideoCapture &capVideo)
+inline unsigned int getTotalFrames(cv::VideoCapture &capVideo)
 {
 	return (unsigned int)capVideo.get(CV_CAP_PROP_FRAME_COUNT);
 }
 
-unsigned int getFrameNumber(cv::VideoCapture &capVideo)
+inline unsigned int getFrameNumber(cv::VideoCapture &capVideo)
 {
 	return (unsigned int)capVideo.get(CV_CAP_PROP_POS_FRAMES);
 }
 
-bool IsThereFramesToRead(cv::VideoCapture &capVideo)
+inline bool IsThereFramesToRead(cv::VideoCapture &capVideo)
 {
 	return (getFrameNumber(capVideo) + 1 < getTotalFrames(capVideo));
 }
 
-bool readImageFrameFromVideo(cv::Mat &imageFrame, cv::VideoCapture &capVideo)
+inline bool readImageFrameFromVideo(cv::Mat &imageFrame, cv::VideoCapture &capVideo)
 {
 	return (IsThereFramesToRead(capVideo) && capVideo.read(imageFrame));
 }

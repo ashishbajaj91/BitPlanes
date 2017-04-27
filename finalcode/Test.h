@@ -10,6 +10,7 @@
 #include "ComputeDs.h"
 #include "lukaskanade.h"
 #include "imageFunctions.h"
+#include "warpCoordinates.h"
 
 void RunTest(bool result, std::string message)
 {
@@ -257,6 +258,38 @@ bool testApplyGaussianFilterOnPlanes()
 	return true;
 }
 
+bool testInverseWarp(const cv::String &imagefilename)
+{
+	cv::Mat image;
+	readImage(image, imagefilename);
+
+	double inCoords[8] = {	image.cols / 10.0, image.rows/10.0, 
+							image.cols / 1.5, image.rows/8.0,
+							image.cols / 1.8, image.rows / 1.5,
+							image.cols / 10.0, image.rows / 1.8,							
+						};
+
+	double warpedCoords[8];
+
+	auto gray_image = convertToGrayScale(image);
+	auto img_src = convertToDouble(gray_image);
+	Eigen::Matrix3d W(3, 3);
+
+	W <<	0.7,	-0.7,	0,
+			0.7,	0.7,	0,
+			0,		0,		1;
+
+	int out_size[] = { img_src.rows, img_src.cols };
+	cv::Mat target = ApplyWarp(img_src, W, img_src.rows, img_src.cols);
+
+	warpCoords(warpedCoords, inCoords, W, img_src.cols, img_src.rows, false);
+
+	showImage(drawBoundingBox(inCoords, img_src), "original image");
+	showImage(drawBoundingBox(warpedCoords, target), "warped image");
+
+	return true;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl << std::endl;
@@ -282,6 +315,9 @@ void RunTests(int argc, char** argv)
 		cv::waitKey(0);
 		destroyWindow("All");
 
+		RunTest(testInverseWarp(argv[1]), "Warped Coordinates");
+		cv::waitKey(0);
+		destroyWindow("All");
 	}
 	if (argc > 2)
 	{

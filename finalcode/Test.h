@@ -26,7 +26,8 @@ bool testReadVideo(const cv::String &videofilename)
 bool testGenerateBitplanes(cv::Mat &image)
 {
 	cv::Mat gray_image = convertToGrayScale(image);
-	auto bitplaneImage = generateBitPlanes(gray_image);
+	cv::Mat double_image = convertToDouble(gray_image);
+	auto bitplaneImage = generateBitPlanes(double_image);
 
 	for (int k = 0; k < 8; k++)
 	{
@@ -35,7 +36,7 @@ bool testGenerateBitplanes(cv::Mat &image)
 
 		std::string winname = "bitplaneImage";
 		createNamedWindow( (winname + std::to_string(k)).c_str() );
-		cv::Mat temp = 255 * bitplaneImage[k];
+		auto temp = bitplaneImage[k];
 		showImage(temp, (winname + std::to_string(k)).c_str());
 	}
 	return true;
@@ -100,8 +101,8 @@ bool testImageSubtract()
 		}
 	}
 
-	cv::Mat_<double> adoub = convertToDouble(a);
-	cv::Mat_<double> bdoub = convertToDouble(b);
+	cv::Mat adoub = convertToDouble(a);
+	cv::Mat bdoub = convertToDouble(b);
 	
 	cv::Mat_<double> result;
 	if (SubtractImages(result, adoub, bdoub))

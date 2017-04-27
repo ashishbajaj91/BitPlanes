@@ -11,6 +11,14 @@
 #include "lukaskanade.h"
 #include "imageFunctions.h"
 
+void RunTest(bool result, std::string message)
+{
+	if (result)
+		std::cout << message + " Test Succeeded" << std::endl;
+	else
+		std::cout << message + " Test Failed" << std::endl;
+}
+
 bool testReadImage(const cv::String &imagefilename)
 {
 	cv::Mat image;
@@ -23,8 +31,11 @@ bool testReadVideo(const cv::String &videofilename)
 	return ReadAndDisplayVideo(capVideo, videofilename);
 }
 
-bool testGenerateBitplanes(cv::Mat &image)
+bool testGenerateBitplanes(const cv::String &imagefilename)
 {
+	cv::Mat image;
+	readImage(image, imagefilename);
+
 	cv::Mat gray_image = convertToGrayScale(image);
 	cv::Mat double_image = convertToDouble(gray_image);
 	auto bitplaneImage = generateBitPlanes(double_image);
@@ -42,8 +53,11 @@ bool testGenerateBitplanes(cv::Mat &image)
 	return true;
 }
 
-bool testimwarp(cv::Mat &image)
+bool testimwarp(const cv::String &imagefilename)
 {
+	cv::Mat image;
+	readImage(image, imagefilename);
+
 	auto gray_image = convertToGrayScale(image);
 	auto img_src = convertToDouble(gray_image);
 	Eigen::Matrix3d W(3, 3); 
@@ -77,8 +91,11 @@ bool testimwarp(cv::Mat &image)
 	return cv::countNonZero(target2 - img_src > 1e-10) == 0;
 }
 
-bool testpadImages(cv::Mat &image)
+bool testpadImages(const cv::String &imagefilename)
 {
+	cv::Mat image;
+	readImage(image, imagefilename);
+
 	cv::Mat result = AddPaddingToImage(image, 10, 10, 10, 10, 0);
 	showImage(result, "Padded Image");
 
@@ -134,8 +151,11 @@ bool testImageSubtract()
 	return false;
 }
 
-bool testReshapeDs(cv::Mat &image)
+bool testReshapeDs(const cv::String &imagefilename)
 {
+	cv::Mat image;
+	readImage(image, imagefilename);
+
 	cv::Mat gray_image = convertToGrayScale(image);
 	cv::Mat double_image = convertToDouble(gray_image);
 	auto bitplaneImage = generateBitPlanes(double_image);
@@ -237,157 +257,43 @@ bool testApplyGaussianFilterOnPlanes()
 	return true;
 }
 
-void RunTestReadImage(cv::String filename)
-{
-	if (testReadImage(filename))
-		std::cout << "Image Read Test Succeeded" << std::endl;
-	else
-		std::cout << "Image Read Test Failed" << std::endl;
-}
-
-void RunTestReadVideo(cv::String videofilename)
-{
-	if (testReadVideo(videofilename))
-		std::cout << "Video Read Test Succeeded" << std::endl;
-	else
-		std::cout << "Video Read Test Failed" << std::endl;
-}
-
-void RunTestGenerateBitplanes(cv::String filename)
-{
-	cv::Mat image;
-	readImage(image, filename);
-	if (testGenerateBitplanes(image))
-		std::cout << "BitPlanes Test Succeeded" << std::endl;
-	else
-		std::cout << "BitPlanes Test Failed" << std::endl;
-}
-
-void RunTestImwarp(cv::String filename)
-{
-	cv::Mat image;
-	readImage(image, filename);
-	if (testimwarp(image))
-		std::cout << "ImWarp Test Succeeded" << std::endl;
-	else
-		std::cout << "Imwarp Test Failed" << std::endl;
-}
-
-void RunTestPadImage(cv::String filename)
-{
-	cv::Mat image;
-	readImage(image, filename);
-	if (testpadImages(image))
-		std::cout << "Pad Images Test Succeeded" << std::endl;
-	else
-		std::cout << "Pad Images Failed" << std::endl;
-}
-
-void RunTestDs2H()
-{
-	if (testds2H())
-		std::cout << "Ds2H Test Succeeded" << std::endl;
-	else
-		std::cout << "Ds2H Test Failed" << std::endl;
-}
-
-void RunImageTestSubtract()
-{
-	if (testImageSubtract())
-	{
-		std::cout << "Image Subtraction Test Succeeded" << std::endl;
-	}
-	else
-	{
-		std::cout << "Image Subtraction Failed" << std::endl;
-	}
-}
-
-void RunTestReshapeDs(cv::String filename)
-{
-	cv::Mat image;
-	readImage(image, filename);
-	if (testReshapeDs(image))
-		std::cout << "Reshape Ds Test Succeeded" << std::endl;
-	else
-		std::cout << "Reshape Ds Test Failed" << std::endl;
-}
-
-void RunTestCheckForNaN()
-{
-	if(testCheckForNaN())
-	{
-		std::cout << "NaN Test Succeeded" << std::endl;
-	}
-	else
-	{
-		std::cout << "NaN Test Failed" << std::endl;
-	}
-}
-
-void RunTestCheckForNotNaNIinPlanes()
-{
-	if(testCheckForNotNaNinPlanes())
-	{
-		std::cout << "Not NaN in Plane Test Succeeded" << std::endl;
-	}
-	else
-	{
-		std::cout << "Not NaN in Plane Test Failed" << std::endl;
-	}
-}
-
-void RunTestApplyGaussianFilterOnPlanes()
-{
-	if(testApplyGaussianFilterOnPlanes())
-	{
-		std::cout << "Gaussian Filter Test Succeeded" << std::endl;
-	}
-	else
-	{
-		std::cout << "Gaussian Filter Test Failed" << std::endl;
-	}
-}
-
 void RunTests(int argc, char** argv)
 {
-	std::cout << "Starting the tests" << std::endl;
+	std::cout << "Starting the tests" << std::endl << std::endl;
 	if (argc > 1)
 	{
-		RunTestReadImage(argv[1]);
+		RunTest(testReadImage(argv[1]), "Image Read");
 		cv::waitKey(0);
 		destroyWindow("All");
 
-		RunTestGenerateBitplanes(argv[1]);
+		RunTest(testGenerateBitplanes(argv[1]), "BitPlanes Generation");
 		cv::waitKey(0);
 		destroyWindow("All");
 
-		RunTestImwarp(argv[1]);
+		RunTest(testimwarp(argv[1]), "ImWarp");
 		cv::waitKey(0);
 		destroyWindow("All");
 
-		RunTestPadImage(argv[1]);
+		RunTest(testpadImages(argv[1]), "Pad Images");
 		cv::waitKey(0);
 		destroyWindow("All");
 
-		RunTestReshapeDs(argv[1]);
+		RunTest(testReshapeDs(argv[1]), "Reshape Ds");
 		cv::waitKey(0);
 		destroyWindow("All");
 
 	}
 	if (argc > 2)
 	{
-		RunTestReadVideo(argv[2]);
+		RunTest(testReadVideo(argv[2]), "Video Read");
 		destroyWindow("All");
 	}
-
-	RunTestDs2H();
-	RunImageTestSubtract();
-	RunTestCheckForNaN();
-	RunTestCheckForNotNaNIinPlanes();
-	RunTestApplyGaussianFilterOnPlanes();
-
-	std::cout << "All Tests Done" << std::endl;
+	RunTest(testds2H(), "Ds2H");
+	RunTest(testImageSubtract(), "Image Subtract");
+	RunTest(testCheckForNaN(), "Check for NaN");
+	RunTest(testCheckForNotNaNinPlanes(), "Not NaN in Plane");
+	RunTest(testApplyGaussianFilterOnPlanes(), "Gaussian Filter on Plane");
+	std::cout << std::endl << "All Tests Done" << std::endl;
 }
 
 #endif

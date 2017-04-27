@@ -116,13 +116,7 @@ cv::Mat ComputeGradientInY(std::vector<cv::Mat> &Iref)
 }
 std::vector<cv::Mat> ApplyWarpToBitPlanes(std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H)
 {
-	std::vector<cv::Mat> WarpedPlanes;
-	for (int i = 0; i < Iref.size(); i++)
-	{
-		cv::Mat_<double> Ip = ApplyWarp(Iref[i], H, Iref[i].rows, Iref[i].cols);
-		WarpedPlanes.push_back(Ip);
-	}
-	return WarpedPlanes;
+	return ApplyWarpOnPlanes(Iref, H, Iref[0].rows, Iref[0].cols);
 }
 
 cv::Mat ComputeGradientPostWarping(std::vector<cv::Mat> &Iref, Eigen::Matrix3d H)

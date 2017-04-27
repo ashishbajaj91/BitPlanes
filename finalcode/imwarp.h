@@ -47,7 +47,7 @@ cv::Mat InitializeTargetImage(int nrows, int ncols, int imagetype, cv::Scalar sc
 	return cv::Mat(nrows, ncols, imagetype, scalar);
 }
 
-cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
+cv::Mat ApplyWarp(cv::Mat &imgSrc, Eigen::Matrix3d &warpMat, int targetRows, int targetCols)
 {
 	int imageWidth = imgSrc.cols;
 	int imageHeight = imgSrc.rows;
@@ -75,7 +75,7 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int targetRows, int t
 	return target;
 }
 
-std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
+std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matrix3d &warpMat, int targetRows, int targetCols)
 {
 	int imageWidth = imgSrc[0].cols;
 	int imageHeight = imgSrc[0].rows;

@@ -22,7 +22,6 @@ bool RunLucasKanade(int argc, char** argv)
 	}
 
 	// Create Rect object ???
-
 	cv::Mat_<double> imageFrame;
 	int count = 0;
 
@@ -36,10 +35,7 @@ bool RunLucasKanade(int argc, char** argv)
 	std::vector<cv::Mat_<double>> Ds;
 	cv::Mat_<double> Mref;
 
-	Eigen::Matrix3d H;
-	H << 1, 0, 0,
-		0, 1, 0,
-		0, 0, 1;
+	Eigen::Matrix3d H = Eigen::Matrix3d::Identity();
 
 	while (readImageFrameFromVideo(imageFrame,capVideo))
 	{

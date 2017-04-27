@@ -181,15 +181,16 @@ bool testCheckForNaN()
 	}
 
 	auto paddedImage = AddPaddingToImage(a, 1, 1, 1, 1, fNaN);
-	auto NaNMat = CheckForNaN(paddedImage);
+	cv::Mat NaNMat = CheckForNaN(paddedImage);
+
 	for (int i = 0; i < 12; ++i)
 	{
 		for (int j = 0; j < 12; ++j)
 		{
 			if (i == 0 || j == 0 || i == 11 || j == 11)
-				if (NaNMat.at<double>(i, j) != 1.0)
+				if (NaNMat.at<uint8_t>(i, j) != 255)
 					return false;
-			//std::cout << NaNMat.at<double>(i, j) << " ";
+			//std::cout << NaNMat.at<uint8_t>(i, j) << " ";
 		}
 		//std::cout << std::endl;
 	}
@@ -221,9 +222,9 @@ bool testCheckForNotNaNinPlanes()
 		for (int j = 0; j < 12; ++j)
 		{
 			if (i == 0 || j == 0 || i == 11 || j == 11)
-				if (NotNaNMat.at<double>(i, j) != 0.0)
+				if (NotNaNMat.at<uint8_t>(i, j) != 0)
 					return false;
-			//std::cout << NotNaNMat.at<double>(i, j) << " ";
+			//std::cout << NotNaNMat.at<uint8_t>(i, j) << " ";
 		}
 		//std::cout << std::endl;
 	}

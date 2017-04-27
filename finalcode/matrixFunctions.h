@@ -5,13 +5,13 @@
 
 cv::Mat CheckForNaN(cv::Mat &image)
 {
-	cv::Mat IsNaN = cv::Mat_<double>(image != image)/255;
+	cv::Mat IsNaN = (image != image);
 	return IsNaN;
 }
 
 cv::Mat CheckForNotNaN(cv::Mat &image)
 {
-	cv::Mat IsNotNaN = cv::Mat_<double>(image == image) / 255;
+	cv::Mat IsNotNaN = (image == image);
 	return IsNotNaN;
 }
 
@@ -24,7 +24,7 @@ cv::Mat CheckForNaNinPlanes(std::vector<cv::Mat> &image)
 			IsNaN = CheckForNaN(image[i]);
 		else
 		{
-			IsNaN = cv::Mat_<double>(IsNaN | CheckForNaN(image[i]));
+			IsNaN = (IsNaN | CheckForNaN(image[i]));
 		}
 	}
 	return IsNaN;
@@ -39,7 +39,7 @@ cv::Mat CheckForNotNaNinPlanes(std::vector<cv::Mat> &image)
 			IsNotNaN = CheckForNotNaN(image[i]);
 		else
 		{
-			IsNotNaN = cv::Mat_<double>(IsNotNaN & CheckForNotNaN(image[i]));
+			IsNotNaN = (IsNotNaN & CheckForNotNaN(image[i]));
 		}
 	}
 	return IsNotNaN;

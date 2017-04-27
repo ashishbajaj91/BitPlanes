@@ -54,10 +54,21 @@ void UpdatedsFromMat(cv::Mat &dsMat, double ds[])
 
 void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[])
 {
-	cv::Mat_<double> NotNaNdI = cv::Mat_<double>(dI & M);
+	cv::Mat_<double> NotNaNdI;
+	dI.copyTo(NotNaNdI);
+
+	std::cout << "0" << std::endl;
+
+	NotNaNdI.setTo(0.0, ~M);
 	NotNaNdI = ReshapeImageToColumn(NotNaNdI);
 
-	cv::Mat_<double> NotNaNDs = cv::Mat_<double>(AddPaddingToImage(ReshapeImageToColumn(M), 0, 0, 0, Ds.cols - 1) & Ds);
+	std::cout << "1" << std::endl;
+
+	cv::Mat_<double> NotNaNDs;
+	Ds.copyTo(NotNaNDs);
+	NotNaNDs.setTo(0.0, ~AddPaddingToImage(ReshapeImageToColumn(M), 0, 0, 0, Ds.cols - 1));
+
+	std::cout << "2" << std::endl;
 
 	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI))/64;
 	UpdatedsFromMat(dsMat, ds);
@@ -109,7 +120,9 @@ double ComputeSummedError(cv::Mat &dI0, cv::Mat &M)
 
 double ComputeMeanError(cv::Mat &dI0, cv::Mat &M)
 {
-	cv::Mat result = cv::Mat_<double>( dI0 & M );
+	cv::Mat result;
+	dI0.copyTo(result);
+	result.setTo(0.0, ~M);
 	return cv::mean(result)[0];
 }
 
@@ -133,8 +146,9 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
 
 		auto dI0 = ComputeError(Ip, Iref);
+		dI0 /= 8;
 
-		cv::Mat M = cv::Mat_<double>(Mref & CheckForNotNaNinPlanes(Ip));
+		cv::Mat M = (Mref & CheckForNotNaNinPlanes(Ip));
 
 		Computeds(Ds, M, dI, lambda, ds);
 

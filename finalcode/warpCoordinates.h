@@ -44,12 +44,10 @@ void warpCoords(double warpedCoords[8], double inCoords[8], Eigen::Matrix3d &war
  * such that [top left, top right, bottom right, bottom left] order
  * @input img2Draw: opencv image in BGR
  */
-cv::Mat drawBoundingBox(double ptsCoords[8], cv::Mat &image)
+cv::Mat drawBoundingBox(double ptsCoords[8], cv::Mat &img2Draw)
 {
-	cv::Mat img2Draw;
-	image.copyTo(img2Draw);
 	cv::Scalar RED(0,0,255);
-    int linethickness = 1;
+    int linethickness = 2;
     int lineType = 8;
     int shift = 0;
 

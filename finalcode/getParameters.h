@@ -28,7 +28,7 @@ void getWeights(int nrows, int ncols, double wts[8])
 
 double getEpsilon()
 {
-	return double(1e-3);
+	return double(1e-10);
 }
 
 double getLambda()
@@ -36,12 +36,12 @@ double getLambda()
 	return double(1e-6);
 }
 
-bool * getKeep(std::string method)
+void getKeep(std::string method, int keep[8])
 {
-	bool keep[] = {0, 0, 0, 0, 
-					 0, 0, 0, 0};
+	for (int i = 0; i < 8; i++)
+		keep[i] = 0;
 
-	if (method == "transation")
+	if (method == "translation")
 	{
 		keep[0] = 1;
 		keep[1] = 1;
@@ -89,14 +89,13 @@ bool * getKeep(std::string method)
 	{
 		std::cout << "Invalid Method" << std::endl;
 	}
-	return keep;
 }
 
 int getNoOfParameters(bool keep[])
 {
 	int nParameters = 0;
 	for (int i = 0; i < 8; i++)
-		if (keep[i] == true)
+		if (keep[i])
 			nParameters++;
 }
 

@@ -59,14 +59,14 @@ cv::Mat ComputeBitPlaneGradient(std::vector<cv::Mat> &image1, std::vector<cv::Ma
 {
 	auto result = SubtractBitPlanes(image1, image2);
 	cv::Mat gradient_avg;
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < image1.size(); i++)
 	{
 		if (i == 0)
 			gradient_avg = result[i];
 		else
-			gradient_avg += result[i];
+			cv::add(result[i], gradient_avg, gradient_avg);
 	}
-	gradient_avg /= 8;
+	gradient_avg /= (1.0*image1.size());
 	return gradient_avg;
 }
 
@@ -93,7 +93,8 @@ cv::Mat ComputeGradientInX(std::vector<cv::Mat> &Iref)
 	for (int i = 0; i < Iref.size(); i++)
 	{
 		cv::Mat temp1 = Iref[i].colRange(1, Iref[i].cols);
-		cv::Mat temp2 = Iref[i].colRange(0, Iref[i].cols - 1);
+		cv::Mat temp2 = Iref[i].colRange(0, Iref[i].cols-1);
+
 		image1.push_back(temp1);
 		image2.push_back(temp2);
 	} 
@@ -108,7 +109,7 @@ cv::Mat ComputeGradientInY(std::vector<cv::Mat> &Iref)
 	for (int i = 0; i < Iref.size(); i++)
 	{
 		cv::Mat temp1 = Iref[i].rowRange(1, Iref[i].rows);
-		cv::Mat temp2 = Iref[i].colRange(0, Iref[i].rows - 1);
+		cv::Mat temp2 = Iref[i].rowRange(0, Iref[i].rows - 1);
 		image1.push_back(temp1);
 		image2.push_back(temp2);
 	}
@@ -135,11 +136,10 @@ cv::Mat ReshapeDs(std::vector<cv::Mat> &WarpedGradients)
 		else
 			cv::hconcat(reshaped_gradients, WarpedGradients[i].reshape(1, WarpedGradients[i].rows* WarpedGradients[i].cols), reshaped_gradients);
 	}
-
 	return reshaped_gradients;
 }
 
-cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, bool keep[], double wts[], cv::Mat &Mref)
+cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, int keep[], double wts[], cv::Mat &Mref)
 {	
 	std::vector<cv::Mat> WarpGradients; //= InitializeZeroGradients(Iref[0]);
 	int counter = 0;
@@ -150,17 +150,18 @@ cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, bool keep[], double 
 	auto Hs = ds2Hs(ds, wts);
 
 	//Gradient in X direction
-	if (keep[0] == true)
+	if (keep[0])
 	{
 		cv::Mat GradientX = ComputeGradientInX(Iref);
 		WarpGradients.push_back(AddPaddingToImage(GradientX, 0, 0, 0, 1, 0));
+
 		counter++;
 	}
 	//Gradient in Y direction
-	if (keep[1] == true)
+	if (keep[1])
 	{
 		cv::Mat GradientY = ComputeGradientInY(Iref);
-		WarpGradients.push_back(AddPaddingToImage(GradientY, 0, 1, 0, 0, 0));
+		WarpGradients.push_back(AddPaddingToImage(GradientY, 0, 1, 0, 0, 0.0));
 		counter++;
 	}
 	//Compute Gradient for other transformations

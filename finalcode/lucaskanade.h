@@ -15,30 +15,6 @@ void Initializeds(double ds[8])
 		ds = 0;
 }
 
-cv::Mat ReshapeImageToColumn(cv::Mat &image)
-{
-	cv::Mat result = image.reshape(image.channels(), image.rows * image.cols);
-	return result;
-}
-
-cv::Mat ReshapeImageToRow(cv::Mat &image)
-{
-	cv::Mat result = image.reshape(image.channels(), 1);
-	return result;
-}
-
-cv::Mat Transpose(cv::Mat &image)
-{
-	cv::Mat result;
-	cv::transpose(image, result);
-	return result;
-}
-
-cv::Mat InnerProduct(cv::Mat mat1, cv::Mat mat2)
-{
-	return Transpose(mat1) * (mat2);
-}
-
 void UpdatedsFromMat(cv::Mat &dsMat, double ds[])
 {
 	for (int i = 0; i < 8; i++)
@@ -56,21 +32,14 @@ void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[]
 {
 	cv::Mat_<double> NotNaNdI;
 	dI.copyTo(NotNaNdI);
-
-	//std::cout << "0" << std::endl;
-
 	NotNaNdI.setTo(0.0, ~M);
 	NotNaNdI = ReshapeImageToColumn(NotNaNdI);
-
-	//std::cout << "1-" << cv::countNonZero(CheckForNaN(NotNaNdI)) << std::endl;
 
 	cv::Mat_<double> NotNaNDs;
 	Ds.copyTo(NotNaNDs);
 	NotNaNDs.setTo(0.0, ~AddPaddingToImage(ReshapeImageToColumn(M), 0, 0, 0, Ds.cols - 1));
-	//std::cout << "2-" << cv::countNonZero(CheckForNaN(NotNaNDs)) << std::endl;
 
-	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI))/64;
-	//std::cout << dsMat.rows << " " << dsMat.cols << std::endl;
+	cv::Mat_<double> dsMat = (InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv() * (InnerProduct(NotNaNDs, NotNaNdI));
 	UpdatedsFromMat(dsMat, ds);
 }
 
@@ -136,8 +105,8 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 	double ds[8];
 	Initializeds(ds);
 
-	double h = I[0].rows - 2;
-	double w = I[0].cols - 2;
+	double h = I[0].rows;
+	double w = I[0].cols;
 
 	cv::Mat_<double> lambda = h*w*lambdathreshold*cv::Mat_<double>::eye(8,8);
 
@@ -148,18 +117,19 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
 
 		auto dI0 = ComputeError(Ip, Iref);
-		dI0 /= 8;
+		dI0 /= (1.0*I.size());
 
 		cv::Mat M = (Mref & CheckForNotNaNinPlanes(Ip));
 
 		Computeds(Ds, M, dI, lambda, ds);
-
 		UpdateDsWithKeep(keep, ds);
 
 		H = H * Hs2H(ds2Hs(ds, wts));
+		H /= H(2, 2);
+
 		auto error0 = error;
 		error = ComputeMeanError(dI0, M);
-		std::cout << "Current Error:" << error << std::endl;
+		//std::cout << "Current Error:" << error << std::endl;
 		if ((error0 - error) < epsilon)
 			break;
 	}

@@ -28,7 +28,7 @@ void getWeights(int nrows, int ncols, double wts[8])
 
 double getEpsilon()
 {
-	return double(1e-10);
+	return double(1e-4);
 }
 
 double getLambda()

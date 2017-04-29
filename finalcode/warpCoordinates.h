@@ -12,7 +12,7 @@
  * @input image_size: [rows, cols]
  * @output warpedCoords: [x1, y1, x2, y2, x3, y3, x4, y4]
  */
-void warpCoords(double warpedCoords[8], double inCoords[8], Eigen::Matrix3d &warpMat, double imgWidth, double imgHeight, bool IsInverse = true)
+void warpCoords(double warpedCoords[8], double inCoords[8], Eigen::Matrix3d warpMat, double imgWidth, double imgHeight, bool IsInverse = true)
 {
     double xOffset = (imgWidth + 1)/2.0 - 1;
     double yOffset = (imgHeight + 1)/2.0 - 1;

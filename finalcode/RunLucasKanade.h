@@ -35,8 +35,7 @@ bool RunLucasKanade(int argc, char** argv)
 	cv::Mat_<double> imageFrame;
 	int count = 0;
 
-	// Allocate memory for workspace variables :
-	double sigma = 11;
+	double sigma = 2.0;
 	std::vector<cv::Mat> Iref_bitPlane;
 
 	double epsilon = getEpsilon(), lambda = getLambda(), weights[8];
@@ -58,22 +57,17 @@ bool RunLucasKanade(int argc, char** argv)
 	createNamedWindow("Current Frame");
 	while (readImageFrameFromVideo(imageFrame,capVideo))
 	{
-		//if (count % 25 != 0)
-		//{
-		//	++count;
-		//	//std::cout << "skipping" << count << std::endl;
-		//	continue;
-		//}
 		cv::Mat_<double> I = convertToDouble(convertToGrayScale(imageFrame));
 		if (count == 0)
 		{
 			//Iref_bitPlane = generateBitPlanes(I);
 			Iref_bitPlane.push_back(I);
 			ApplyGaussianFilterOnPlanes(Iref_bitPlane, sigma);
-			AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
+			//AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
+
 			getWeights(Iref_bitPlane[0].rows, Iref_bitPlane[0].cols, weights);
+
 			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights, Mref);
-			std::cout << keep[0] << keep[7];
 		}
 		else
 		{
@@ -81,7 +75,7 @@ bool RunLucasKanade(int argc, char** argv)
 			std::vector<cv::Mat> I_bitPlane;
 			I_bitPlane.push_back(I);
 			ApplyGaussianFilterOnPlanes(I_bitPlane, sigma);
-			AddPaddingtoBitPlaneswithNaN(I_bitPlane, 2, 2, 2, 2);
+			//AddPaddingtoBitPlaneswithNaN(I_bitPlane, 2, 2, 2, 2);
 			
 			if (!LukasKanade(I_bitPlane, Iref_bitPlane, H, Ds, Mref, weights, keep, epsilon, lambda))
 			{
@@ -90,10 +84,8 @@ bool RunLucasKanade(int argc, char** argv)
 			}
 		}
 		std::cout << "Count:" << count << std::endl;
-		//std::cout << H << std::endl;
 		++count;
 		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);
-		//std::cout << warpedCoords[0] << warpedCoords[1];
 		cv::Mat image;
 		cv::resize(drawBoundingBox(warpedCoords, imageFrame), image, imageFrame.size() / 2);
 		showImage(image, "Current Frame");
@@ -109,5 +101,4 @@ bool RunLucasKanade(int argc, char** argv)
 	destroyWindow("All");
 	return true;
 }
-
 #endif

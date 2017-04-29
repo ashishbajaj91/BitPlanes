@@ -21,8 +21,6 @@ T Interpolate(cv::Mat &image, imwarpdatatype  y, imwarpdatatype  x)
 	imwarpdatatype k1 = modf(x, &xd); // k1 is the fractional, xd is the integer of x
 	imwarpdatatype k2 = modf(y, &yd);
 
-	//std::cout << "Here9.6" << std::endl;
-
 	// Check whether the pixels are within the image
 	if (x >= 0.0 && (x <= (1.0*image.cols-1)) && y >= 0.0 && (y <= (1.0*image.rows-1)))
 	{
@@ -92,12 +90,8 @@ std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matr
 	warpMat = warpMat.inverse().eval();
 	warpMat /= warpMat(2, 2);
 
-	//std::cout << "Here9.2" << std::endl;
-
 	Eigen::Vector3d X;      // Point in coordinate frame of source.
 	Eigen::Vector3d U;      // Point in coordinate frame of target.
-
-	//std::cout << "Here9.3" << std::endl;
 
 	for (int v = 0; v < targetRows; v++)
 	{
@@ -107,12 +101,9 @@ std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matr
 			X = warpMat * U;
 			imwarpdatatype  y = X(0) / X(2);
 			imwarpdatatype  x = X(1) / X(2);
-			//if(v==0 && u ==0) 	std::cout << "Here9.4" << std::endl;
 
 			for (int k = 0; k < imgSrc.size(); k++)
 			{
-				//if (v == 0 && u == 0 ) 	std::cout << "Here9.5" << std::endl;
-
 				imwarpdatatype  I2 = Interpolate<imwarpdatatype >(imgSrc[k], imwarpdatatype(y + ((imageHeight + 1) / 2.0 - 1)),
 					imwarpdatatype(x + ((imageWidth + 1) / 2.0) - 1));
 				target[k].at<imwarpdatatype>(v, u) = I2;

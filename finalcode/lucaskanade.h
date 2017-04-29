@@ -115,6 +115,7 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
+		dI /= (1.0*I.size()*I.size());
 
 		auto dI0 = ComputeError(Ip, Iref);
 		dI0 /= (1.0*I.size());
@@ -129,7 +130,7 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 
 		auto error0 = error;
 		error = ComputeMeanError(dI0, M);
-		//std::cout << "Current Error:" << error << std::endl;
+		std::cout << "Current Error:" << error << std::endl;
 		if ((error0 - error) < epsilon)
 			break;
 	}

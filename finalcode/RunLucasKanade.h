@@ -47,12 +47,18 @@ bool RunLucasKanade(int argc, char** argv)
 	if (argc > 3)
 		useGrayScale = atoi(argv[3]);
 
+	if (useGrayScale)
+		std::cout << "Running with Gray Scale";
+	else
+		std::cout << "Running with Bit Planes";
+	std::cout << std::endl;
+
 	Eigen::Matrix3d H = Eigen::Matrix3d::Identity();
 
-	double inCoords[8] = {	220,100,
-							900,100, 
-							900,650,
-							200,650};
+	double inCoords[8] = {	218,94,
+							910,89, 
+							908,655,
+							212,651};
 
 	double warpedCoords[8];
 
@@ -72,7 +78,6 @@ bool RunLucasKanade(int argc, char** argv)
 			//AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
 
 			getWeights(Iref_bitPlane[0].rows, Iref_bitPlane[0].cols, weights);
-
 			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights, Mref);
 		}
 		else
@@ -91,7 +96,7 @@ bool RunLucasKanade(int argc, char** argv)
 				return false;
 			}
 		}
-		if(count % 10 == 0)
+		//if(count % 10 == 0)
 			std::cout << "Count:" << count << std::endl;
 		++count;
 		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);

@@ -17,8 +17,15 @@ T Interpolate(cv::Mat &image, double y, double x)
     double k1 = modf(x, &xd); // k1 is the fractional, xd is the integer of x
     double k2 = modf(y, &yd);
 
+    // std::cout << "image rows " << image.rows << " image cols " << image.cols << std::endl;
     // Check whether the pixels are within the image
-    if(xi >= 0 && (xi < image.cols-1) && yi >=0 && (yi < image.rows-1))
+    if (xi < 0 || xi > image.cols - 1 || yi < 0 || yi > image.rows - 1)
+    {
+        return fNaN;
+    }
+    //if(xi >= 0 && (xi <= (int)image.cols-1) && yi >=0 && (yi <= (int)image.rows-1))
+    //if(x >= 0.0 && (x <= (1.0*image.cols-1)) && y >=0 && (y <= (1.0*image.rows-1)))
+    else
     {
         int f1 = xi <= image.cols - 2; // Check that pixels to the right
         int f2 = yi <= image.rows - 2; // and to down direction exist.
@@ -32,10 +39,11 @@ T Interpolate(cv::Mat &image, double y, double x)
                                ((f1 && f2) ? (k1 * k2 * px4) : 0);
         return interpolated_value;
     }
-    else
-    {
-        return fNaN;
-    }
+
+//    else
+//    {
+//        return fNaN;
+//    }
 }
 
 /**
@@ -67,9 +75,12 @@ cv::Mat ApplyWarp(cv::Mat imgSrc, Eigen::Matrix3d warpMat, int out_size[])
             X = warpMat * U;
             double y = X(0) / X(2);
             double x = X(1) / X(2);
-            double I2 = Interpolate<double>(imgSrc, double(y + ((imageHeight + 1) / 2.0 - 1)),
-                                          double(x + ((imageWidth + 1) / 2.0) - 1));
+            y = double(y + ((imageHeight + 1) / 2.0 - 1));
+            x = double(x + ((imageWidth + 1) / 2.0) - 1);
+            double I2 = Interpolate<double>(imgSrc, y,
+                                          x);
             target.at<double>(v, u) = I2;
+            std::cout << y << " " << x << " " << v << "," << u << " " <<I2 << std::endl;
         }
     }
     return target;

@@ -43,6 +43,10 @@ bool RunLucasKanade(int argc, char** argv)
 	cv::Mat_<double> Ds;
 	cv::Mat Mref;
 
+	int useGrayScale = 1;
+	if (argc > 3)
+		useGrayScale = atoi(argv[3]);
+
 	Eigen::Matrix3d H = Eigen::Matrix3d::Identity();
 
 	double inCoords[8] = {	220,100,
@@ -60,8 +64,10 @@ bool RunLucasKanade(int argc, char** argv)
 		cv::Mat_<double> I = convertToDouble(convertToGrayScale(imageFrame));
 		if (count == 0)
 		{
-			//Iref_bitPlane = generateBitPlanes(I);
-			Iref_bitPlane.push_back(I);
+			if(!useGrayScale)
+				Iref_bitPlane = generateBitPlanes(I);
+			else
+				Iref_bitPlane.push_back(I);
 			ApplyGaussianFilterOnPlanes(Iref_bitPlane, sigma);
 			//AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
 
@@ -71,9 +77,11 @@ bool RunLucasKanade(int argc, char** argv)
 		}
 		else
 		{
-			//auto I_bitPlane = generateBitPlanes(I);
 			std::vector<cv::Mat> I_bitPlane;
-			I_bitPlane.push_back(I);
+			if (!useGrayScale)
+				I_bitPlane = generateBitPlanes(I);
+			else
+				I_bitPlane.push_back(I);
 			ApplyGaussianFilterOnPlanes(I_bitPlane, sigma);
 			//AddPaddingtoBitPlaneswithNaN(I_bitPlane, 2, 2, 2, 2);
 			
@@ -83,7 +91,8 @@ bool RunLucasKanade(int argc, char** argv)
 				return false;
 			}
 		}
-		std::cout << "Count:" << count << std::endl;
+		if(count % 10 == 0)
+			std::cout << "Count:" << count << std::endl;
 		++count;
 		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);
 		cv::Mat image;

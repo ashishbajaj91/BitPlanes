@@ -57,20 +57,20 @@ void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[]
 	cv::Mat_<double> NotNaNdI;
 	dI.copyTo(NotNaNdI);
 
-	std::cout << "0" << std::endl;
+	//std::cout << "0" << std::endl;
 
 	NotNaNdI.setTo(0.0, ~M);
 	NotNaNdI = ReshapeImageToColumn(NotNaNdI);
 
-	std::cout << "1" << std::endl;
+	//std::cout << "1-" << cv::countNonZero(CheckForNaN(NotNaNdI)) << std::endl;
 
 	cv::Mat_<double> NotNaNDs;
 	Ds.copyTo(NotNaNDs);
 	NotNaNDs.setTo(0.0, ~AddPaddingToImage(ReshapeImageToColumn(M), 0, 0, 0, Ds.cols - 1));
-
-	std::cout << "2" << std::endl;
+	//std::cout << "2-" << cv::countNonZero(CheckForNaN(NotNaNDs)) << std::endl;
 
 	cv::Mat_<double> dsMat = ((InnerProduct(NotNaNDs, NotNaNDs) + lambda).inv()) * (InnerProduct(NotNaNDs, NotNaNdI))/64;
+	//std::cout << dsMat.rows << " " << dsMat.cols << std::endl;
 	UpdatedsFromMat(dsMat, ds);
 }
 
@@ -102,12 +102,14 @@ cv::Mat ComputeSumedSubtraction(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &
 	return dI;
 }
 
-void UpdateDsWithKeep(bool * keep, double ds[])
+void UpdateDsWithKeep(int * keep, double ds[])
 {
 	for (int i = 0; i < 8; i++)
 	{
-		if (keep[i] == false)
+		if (!keep[i])
+		{
 			ds[i] = 0;
+		}
 	}
 }
 
@@ -128,7 +130,7 @@ double ComputeMeanError(cv::Mat &dI0, cv::Mat &M)
 
 bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
 				 cv::Mat &Ds, cv::Mat Mref, 
-				 double *wts, bool *keep, double epsilon, double lambdathreshold)
+				 double *wts, int *keep, double epsilon, double lambdathreshold)
 {
 	double error = std::numeric_limits<double>::infinity();
 	double ds[8];
@@ -161,7 +163,6 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		if ((error0 - error) < epsilon)
 			break;
 	}
-
 	return true;
 }
 #endif

@@ -49,7 +49,7 @@ cv::Mat drawBoundingBox(double ptsCoords[8], cv::Mat &image)
 	cv::Mat img2Draw;
 	image.copyTo(img2Draw);
 	cv::Scalar RED(0,0,255);
-    int linethickness = 1;
+    int linethickness = 2;
     int lineType = 8;
     int shift = 0;
 

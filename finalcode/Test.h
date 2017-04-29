@@ -356,6 +356,33 @@ bool testInnerProductImage(const cv::String &imagefilename)
 	return false;
 }
 
+bool testComputeGradientForWarp()
+{
+	cv::Mat_<double> a(5, 5);
+
+	for (int i = 0; i < 5; ++i)
+	{
+		for (int j = 0; j < 5; ++j)
+		{
+			if (i + j < 5)
+				a(i, j) = 1.0;
+			else
+				a(i, j) = 0.0;
+			//std::cout << a(i, j);
+		}
+		//std::cout << std::endl;
+	}
+	std::vector<cv::Mat> vec; vec.push_back(a);
+	double weights[8]; getWeights(vec[0].rows, vec[0].cols, weights);
+	cv::Mat Mref;
+	int keep[8]; getKeep("projective", keep);
+	
+	cv::Mat_<double> Ds = ComputeGradientsForWarp(vec, keep, weights, Mref);
+	if(Ds(0,0) == 0 && Ds(0,1) == 0)
+		return true;
+	return false;
+}
+
 void RunTests(int argc, char** argv)
 {
 	std::cout << "Starting the tests" << std::endl << std::endl;
@@ -405,6 +432,8 @@ void RunTests(int argc, char** argv)
 	RunTest(testCheckForNotNaNinPlanes(), "Not NaN in Plane");
 	RunTest(testApplyGaussianFilterOnPlanes(), "Gaussian Filter on Plane");
 	RunTest(testReshapeImageFunction(), "Reshape Image");
+	RunTest(testComputeGradientForWarp(), "Compute Gradients for Warp");
+
 	std::cout << std::endl << "All Tests Done" << std::endl;
 }
 

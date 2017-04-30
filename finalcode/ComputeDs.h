@@ -5,6 +5,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <ctime>
 
 #include "imwarp.h"
 #include "padImages.h"
@@ -16,7 +17,6 @@ bool SubtractImages(cv::Mat &result, cv::Mat &image1, cv::Mat &image2)
 	if (image1.cols != image2.cols || image1.rows != image2.rows || image1.dims != image2.dims)
 		return false;
 	cv::subtract(image1, image2, result, cv::noArray(), CV_64F);
-	//cv::subtract(image1, image2, result);
 	return true;
 }
 
@@ -110,6 +110,8 @@ cv::Mat ComputeGradientInY(std::vector<cv::Mat> &Iref)
 }
 std::vector<cv::Mat> ApplyWarpToBitPlanes(std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H)
 {
+	if (H == Eigen::Matrix3d::Identity())
+		return Iref;
 	return ApplyWarpOnPlanes(Iref, H, Iref[0].rows, Iref[0].cols);
 }
 

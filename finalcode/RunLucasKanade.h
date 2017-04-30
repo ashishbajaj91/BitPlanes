@@ -38,7 +38,7 @@ bool RunLucasKanade(int argc, char** argv)
 	double sigma = 11.0;
 	std::vector<cv::Mat> Iref_bitPlane;
 
-	double epsilon = getEpsilon(), lambda = getLambda(), weights[8];
+	double epsilon = getEpsilon(), lambdathreshold = getLambda(), weights[8];
 	int keep[8];  getKeep("projective", keep);
 	cv::Mat_<double> Ds;
 	cv::Mat Mref;
@@ -54,6 +54,8 @@ bool RunLucasKanade(int argc, char** argv)
 	std::cout << std::endl;
 
 	Eigen::Matrix3d H = Eigen::Matrix3d::Identity();
+	cv::Mat_<double> lambda;
+
 
 	double inCoords[8] = {	218,94,
 							910,89, 
@@ -79,6 +81,7 @@ bool RunLucasKanade(int argc, char** argv)
 
 			getWeights(Iref_bitPlane[0].rows, Iref_bitPlane[0].cols, weights);
 			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights, Mref);
+			lambda = I.rows*I.cols*lambdathreshold*cv::Mat_<double>::eye(8, 8);
 		}
 		else
 		{

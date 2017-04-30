@@ -40,7 +40,10 @@ void ComputeNotNaNdI(cv::Mat *NotNaNdI, cv::Mat *dI, cv::Mat *M)
 void ComputeNotNaNDs(cv::Mat *NotNaNDs, cv::Mat *Ds, cv::Mat *M)
 {
 	(*Ds).copyTo(*NotNaNDs);
-	(*NotNaNDs).setTo(0.0, ~AddPaddingToImage(ReshapeImageToColumn(*M), 0, 0, 0, (*Ds).cols - 1));
+	cv::Mat temp = ReshapeImageToColumn(*M);
+	cv::Mat temp2 = ~AddPaddingToImage(temp, 0, 0, 0, (*Ds).cols - 1);
+	(*NotNaNDs).setTo(0.0, temp2);
+	//(*NotNaNDs).setTo(0.0, ~AddPaddingToImage(ReshapeImageToColumn(*M), 0, 0, 0, (*Ds).cols - 1));
 	return;
 }
 
@@ -209,6 +212,7 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		auto Ip = ApplyWarpAndExtractAreadOfInterest(I, H, AreaOfInterest);
 		//auto Ip = ApplyWarpToBitPlanes(I, H);
 		//auto Ip = ApplyWarpToBitPlanes(I, H);
+
 		cv::Mat dI; // = ComputeSumedSubtraction(Ip, Iref);
 		cv::Mat dI0; // = ComputeError(Ip, Iref);
 		//ComputedI(dI, Ip, Iref);

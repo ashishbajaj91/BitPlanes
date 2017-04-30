@@ -73,7 +73,9 @@ bool testimwarp(const cv::String &imagefilename)
 	showImage(img_src, "original image");
 	showImage(target, "warped image");
 
-	auto bitplaneImage = ApplyWarpOnPlanes(generateBitPlanes(img_src), W, img_src.rows, img_src.cols);
+	auto temp = generateBitPlanes(img_src);
+	auto bitplaneImage = ApplyWarpOnPlanes(temp, W, img_src.rows, img_src.cols);
+	//auto bitplaneImage = ApplyWarpOnPlanes(generateBitPlanes(img_src), W, img_src.rows, img_src.cols);
 
 	for (int k = 0; k < 8; k++)
 	{
@@ -285,9 +287,13 @@ bool testInverseWarp(const cv::String &imagefilename)
 
 	warpCoords(warpedCoords, inCoords, W, img_src.cols, img_src.rows, true);
 
-	showImage(drawBoundingBox(inCoords, img_src), "original image");
-	showImage(drawBoundingBox(warpedCoords, target), "warped image");
+	auto temp1 = drawBoundingBox(inCoords, img_src);
+	auto temp2 = drawBoundingBox(warpedCoords, target);
+	showImage(temp1, "original image");
+	showImage(temp2, "warped image");
 
+	//showImage(drawBoundingBox(inCoords, img_src), "original image");
+	//showImage(drawBoundingBox(warpedCoords, target), "warped image");
 	return true;
 }
 

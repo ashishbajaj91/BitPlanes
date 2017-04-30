@@ -79,7 +79,9 @@ bool RunLucasKanade(int argc, char** argv)
 	createNamedWindow("Current Frame");
 	while (readImageFrameFromVideo(imageFrame,capVideo))
 	{
-		cv::Mat_<double> I = convertToDouble(convertToGrayScale(imageFrame));
+		auto gray_image = convertToGrayScale(imageFrame);
+		cv::Mat_<double> I = convertToDouble(gray_image);
+		//cv::Mat_<double> I = convertToDouble(convertToGrayScale(imageFrame));
 		if (count == 0)
 		{
 			std::vector<cv::Mat> Iref_bitPlane;
@@ -90,10 +92,9 @@ bool RunLucasKanade(int argc, char** argv)
 			ApplyGaussianFilterOnPlanes(Iref_bitPlane, sigma);
 			//AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
 			Iref = ExtractAreaOfInterestFromPlanes(Iref_bitPlane, AreaOfInterest);
-
 			getWeights(Iref[0].rows, Iref[0].cols, weights);
 			Ds = ComputeGradientsForWarp(Iref, keep, weights, Mref);
-			lambda = I.rows*I.cols*lambdathreshold*cv::Mat_<double>::eye(8, 8);
+			lambda = Iref[0].rows*Iref[0].cols*lambdathreshold*cv::Mat_<double>::eye(8, 8);
 		}
 		else
 		{
@@ -114,11 +115,16 @@ bool RunLucasKanade(int argc, char** argv)
 		//if(count % 10 == 0)
 			std::cout << "Count:" << count << std::endl;
 		++count;
-		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);
+		
+		warpCoords(warpedCoords, inCoords, H, imageFrame.cols, imageFrame.rows, true);
+
 		cv::Mat image = drawBoundingBox(warpedCoords, imageFrame);
+
 		if(saveImage)
 			cv::imwrite("img_" + std::to_string(count) + ".png", image);
-		cv::resize(image, image, imageFrame.size() / 2);
+
+		cv::Size newSize(imageFrame.cols / 2, imageFrame.rows / 2);
+		cv::resize(image, image, newSize);
 		showImage(image, "Current Frame");
 		char chCheckForEscKey = cv::waitKey(1);
 		if (chCheckForEscKey == 27)

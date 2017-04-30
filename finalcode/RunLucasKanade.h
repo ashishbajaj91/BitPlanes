@@ -38,7 +38,7 @@ bool RunLucasKanade(int argc, char** argv)
 	int count = 0;
 
 	double sigma = 11.0;
-	std::vector<cv::Mat> Iref_bitPlane;
+	std::vector<cv::Mat> Iref;
 
 	double epsilon = getEpsilon(), lambdathreshold = getLambda(), weights[8];
 	int keep[8];  getKeep("projective", keep);
@@ -69,6 +69,9 @@ bool RunLucasKanade(int argc, char** argv)
 							908,655,
 							212,651};
 
+	//cv::Rect AreaOfInterest(212, 89, 910 - 212, 655 - 89);
+	cv::Rect AreaOfInterest(212, 89, 698, 566);
+
 	double warpedCoords[8];
 
 	std::cout << "Initialization Done" << std::endl;
@@ -79,15 +82,17 @@ bool RunLucasKanade(int argc, char** argv)
 		cv::Mat_<double> I = convertToDouble(convertToGrayScale(imageFrame));
 		if (count == 0)
 		{
+			std::vector<cv::Mat> Iref_bitPlane;
 			if(!useGrayScale)
 				Iref_bitPlane = generateBitPlanes(I);
 			else
 				Iref_bitPlane.push_back(I);
 			ApplyGaussianFilterOnPlanes(Iref_bitPlane, sigma);
 			//AddPaddingtoBitPlaneswithNaN(Iref_bitPlane, 2, 2, 2, 2);
+			Iref = ExtractAreaOfInterestFromPlanes(Iref_bitPlane, AreaOfInterest);
 
-			getWeights(Iref_bitPlane[0].rows, Iref_bitPlane[0].cols, weights);
-			Ds = ComputeGradientsForWarp(Iref_bitPlane, keep, weights, Mref);
+			getWeights(Iref[0].rows, Iref[0].cols, weights);
+			Ds = ComputeGradientsForWarp(Iref, keep, weights, Mref);
 			lambda = I.rows*I.cols*lambdathreshold*cv::Mat_<double>::eye(8, 8);
 		}
 		else
@@ -100,7 +105,7 @@ bool RunLucasKanade(int argc, char** argv)
 			ApplyGaussianFilterOnPlanes(I_bitPlane, sigma);
 			//AddPaddingtoBitPlaneswithNaN(I_bitPlane, 2, 2, 2, 2);
 			
-			if (!LukasKanade(I_bitPlane, Iref_bitPlane, H, Ds, Mref, weights, keep, epsilon, lambda))
+			if (!LukasKanade(I_bitPlane, Iref, H, Ds, Mref, weights, keep, epsilon, lambda, AreaOfInterest))
 			{
 				std::cout << "Lucas Kanade returned false !" << std::endl;
 				return false;

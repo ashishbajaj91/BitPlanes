@@ -9,6 +9,7 @@
 
 #include "getParameters.h"
 #include "matrixFunctions.h"
+#include "imageFunctions.h"
 
 void Initializeds(double ds[8])
 {
@@ -184,9 +185,16 @@ void ComputeM(cv::Mat *M, cv::Mat *Mref, std::vector<cv::Mat> *Ip)
 	return;
 }
 
+std::vector<cv::Mat> ApplyWarpAndExtractAreadOfInterest( std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H, cv::Rect AreaOfInterest)
+{
+	auto Ip = ApplyWarpToBitPlanes(Iref, H);
+	auto result = ExtractAreaOfInterestFromPlanes(Ip, AreaOfInterest);
+	return result;
+}
+
 bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
 				 cv::Mat &Ds, cv::Mat Mref, 
-				 double *wts, int *keep, double epsilon, cv::Mat lambda)
+				 double *wts, int *keep, double epsilon, cv::Mat lambda, cv::Rect AreaOfInterest)
 {
 	double error = std::numeric_limits<double>::infinity();
 	double ds[8] = {0, 0, 0, 0, 
@@ -198,7 +206,9 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 	{
 		//clock_t begin = clock();
 
-		auto Ip = ApplyWarpToBitPlanes(I, H);
+		auto Ip = ApplyWarpAndExtractAreadOfInterest(I, H, AreaOfInterest);
+		//auto Ip = ApplyWarpToBitPlanes(I, H);
+		//auto Ip = ApplyWarpToBitPlanes(I, H);
 		cv::Mat dI; // = ComputeSumedSubtraction(Ip, Iref);
 		cv::Mat dI0; // = ComputeError(Ip, Iref);
 		//ComputedI(dI, Ip, Iref);

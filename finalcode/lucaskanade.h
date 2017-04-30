@@ -115,7 +115,7 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
 		auto dI = ComputeSumedSubtraction(Ip, Iref);
-		dI /= (1.0*I.size()*I.size());
+		dI /= (1.0*I.size());
 
 		auto dI0 = ComputeError(Ip, Iref);
 		dI0 /= (1.0*I.size());

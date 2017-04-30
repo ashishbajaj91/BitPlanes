@@ -35,7 +35,7 @@ bool RunLucasKanade(int argc, char** argv)
 	cv::Mat_<double> imageFrame;
 	int count = 0;
 
-	double sigma = 2.0;
+	double sigma = 11.0;
 	std::vector<cv::Mat> Iref_bitPlane;
 
 	double epsilon = getEpsilon(), lambda = getLambda(), weights[8];

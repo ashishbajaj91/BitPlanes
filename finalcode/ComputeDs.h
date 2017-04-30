@@ -91,7 +91,8 @@ cv::Mat ComputeGradientInX(std::vector<cv::Mat> &Iref)
 	
 	for (int i = 0; i < Iref.size(); i++)
 	{
-		cv::Mat temp1 = AddPaddingToImage(Iref[i].colRange(1, Iref[i].cols), 0, 0, 0, 1, 0.0);
+		cv::Mat temp = Iref[i].colRange(1, Iref[i].cols);
+		cv::Mat temp1 = AddPaddingToImage(temp, 0, 0, 0, 1, 0.0);
 		image1.push_back(temp1);
 	} 
 
@@ -103,7 +104,8 @@ cv::Mat ComputeGradientInY(std::vector<cv::Mat> &Iref)
 	std::vector <cv::Mat> image1;
 	for (int i = 0; i < Iref.size(); i++)
 	{
-		cv::Mat temp1 = AddPaddingToImage(Iref[i].rowRange(1, Iref[i].rows), 0, 1, 0, 0, 0.0);
+		cv::Mat temp = Iref[i].rowRange(1, Iref[i].rows);
+		cv::Mat temp1 = AddPaddingToImage(temp, 0, 1, 0, 0, 0.0);
 		image1.push_back(temp1);
 	}
 	return ComputeBitPlaneGradient(image1, Iref);

@@ -91,12 +91,13 @@ void getKeep(std::string method, int keep[8])
 	}
 }
 
-int getNoOfParameters(bool keep[])
+int getNoOfParameters(int keep[])
 {
 	int nParameters = 0;
 	for (int i = 0; i < 8; i++)
 		if (keep[i])
 			nParameters++;
+	return nParameters;
 }
 
 #endif

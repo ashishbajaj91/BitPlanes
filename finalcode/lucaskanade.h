@@ -11,13 +11,13 @@
 #include "matrixFunctions.h"
 #include "imageFunctions.h"
 
-void Initializeds(double ds[8])
+void Initializeds(std::vector<double> &ds)
 {
 	for (int i = 0; i < 8; i++)
-		ds = 0;
+		ds[i] = 0;
 }
 
-void UpdatedsFromMat(cv::Mat &dsMat, double ds[])
+void UpdatedsFromMat(cv::Mat &dsMat, std::vector<double> &ds)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -48,7 +48,7 @@ void ComputeNotNaNDs(cv::Mat *NotNaNDs, cv::Mat *Ds, cv::Mat *M)
 }
 
 
-void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, double ds[], double factor = 1.0)
+void Computeds(cv::Mat Ds, cv::Mat &M, cv::Mat &dI, cv::Mat &lambda, std::vector<double> &ds, double factor = 1.0)
 {
 	//cv::Mat_<double> NotNaNdI;
 	//dI.copyTo(NotNaNdI);
@@ -119,7 +119,7 @@ cv::Mat ComputeSumedSubtraction(std::vector<cv::Mat> &Ip, std::vector<cv::Mat> &
 	return dI;
 }
 
-void UpdateDsWithKeep(int * keep, double ds[])
+void UpdateDsWithKeep(int * keep, std::vector<double> &ds)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -195,15 +195,30 @@ std::vector<cv::Mat> ApplyWarpAndExtractAreadOfInterest( std::vector<cv::Mat> &I
 	return result;
 }
 
+double NormOfChange(std::vector<double> vec1, std::vector<double> vec2)
+{
+	double change = 0;
+	for (int i = 0; i < 8; i++)
+		change += abs(vec1[i] - vec2[i]);
+	
+	return change;
+}
+
 bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Matrix3d &H,
 				 cv::Mat &Ds, cv::Mat Mref, 
 				 double *wts, int *keep, double epsilon, cv::Mat lambda, cv::Rect AreaOfInterest)
 {
 	double error = std::numeric_limits<double>::infinity();
-	double ds[8] = {0, 0, 0, 0, 
-					0, 0, 0, 0};
+	/*double ds[8] = {0, 0, 0, 0, 
+					0, 0, 0, 0};*/
 
-	std::thread multi_threads[3];
+	std::vector<double> ds(8, 0);
+	std::vector<double> ds0(8, 0);
+
+	//cv::Mat_<double> ds_Mat = cv::Mat(8, 1, CV_64FC1, 0.0);
+	//cv::Mat_<double> ds_Mat0;
+
+	std::thread multi_threads[2];
 	//Initializeds(ds);
 	for (int i = 0; i < 100; ++i)
 	{
@@ -214,39 +229,41 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 		//auto Ip = ApplyWarpToBitPlanes(I, H);
 
 		cv::Mat dI; // = ComputeSumedSubtraction(Ip, Iref);
-		cv::Mat dI0; // = ComputeError(Ip, Iref);
+		//cv::Mat dI0; // = ComputeError(Ip, Iref);
 		//ComputedI(dI, Ip, Iref);
 		//ComputedI0(dI0, Ip, Iref);
 		cv::Mat M;	// = (Mref & CheckForNotNaNinPlanes(Ip));
 
 		multi_threads[0] = std::thread(ComputedI, &dI, &Ip, &Iref);
-		multi_threads[1] = std::thread(ComputedI0, &dI0, &Ip, &Iref);
+		//multi_threads[2] = std::thread(ComputedI0, &dI0, &Ip, &Iref);
 
 		//This is not fast enough.. Not to be used
 		//ComputeDifferenceAndAbsoluteDifference(dI, dI0, Ip, Iref);
 
-		multi_threads[2] = std::thread(ComputeM, &M, &Mref, &Ip);
+		multi_threads[1] = std::thread(ComputeM, &M, &Mref, &Ip);
 
 		multi_threads[0].join();
-		multi_threads[2].join();
+		multi_threads[1].join();
 
+		ds0 = ds;
 		Computeds(Ds, M, dI, lambda, ds, 1.0*I.size());
 		UpdateDsWithKeep(keep, ds);
 
 		H = H * Hs2H(ds2Hs(ds, wts));
 		H /= H(2, 2);
 
-		auto error0 = error;
+		//auto error0 = error;
 
-		multi_threads[1].join();
-		error = ComputeMeanError(dI0, M, 1.0*I.size());
+		//multi_threads[2].join();
+		//error = ComputeMeanError(dI0, M, 1.0*I.size());
 		//std::cout << "Current Error:" << error << std::endl;
 
 		//clock_t end = clock();
 		//double sec_diff = double(end - begin) / CLOCKS_PER_SEC;
 		//std::cout << "diff: " << sec_diff << std::endl;
 
-		if ((error0 - error) < epsilon)
+		//if ((error0 - error) < epsilon)
+		if( NormOfChange(ds, ds0) < epsilon)
 			break;
 	}
 	return true;

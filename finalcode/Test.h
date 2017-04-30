@@ -112,9 +112,10 @@ bool testds2H()
 	double wts[] = { 1, 1, 1, 1,
 					1, 1, 1, 1 };
 
-	double ds[] = { 0, 0, 0, 0,
-					 0, 0, 0, 0 };
+	//double ds[] = { 0, 0, 0, 0,
+	//				 0, 0, 0, 0 };
 
+	std::vector<double> ds(8, 0);
 	auto Hs = ds2Hs(ds, wts);
 	auto H = Hs2H(Hs);
 	

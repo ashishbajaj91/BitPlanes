@@ -141,9 +141,9 @@ cv::Mat ComputeGradientsForWarp(std::vector<cv::Mat> &Iref, int keep[], double w
 	std::vector<cv::Mat> WarpGradients;
 	int counter = 0;
 
-	double ds[] = { -1.0, -1.0, -1.0, -1.0,
-					 -1.0, -1.0, -1.0, -1.0 };
-
+	//double ds[] = { -1.0, -1.0, -1.0, -1.0,
+	//				 -1.0, -1.0, -1.0, -1.0 };
+	std::vector<double> ds(8, -1.0);
 	auto Hs = ds2Hs(ds, wts);
 
 	//Gradient in X direction

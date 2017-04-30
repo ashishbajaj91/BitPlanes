@@ -26,8 +26,10 @@ bool ValidateInputs(int argc, char** argv, cv::VideoCapture &capVideo)
 
 bool RunLucasKanade(int argc, char** argv)
 {
-	cv::VideoCapture capVideo;
+	//Make sure we are using optimized version
+	cv::setUseOptimized(true);
 
+	cv::VideoCapture capVideo;
 	if (!ValidateInputs(argc, argv, capVideo))
 		return false;
 	
@@ -46,6 +48,11 @@ bool RunLucasKanade(int argc, char** argv)
 	int useGrayScale = 1;
 	if (argc > 3)
 		useGrayScale = atoi(argv[3]);
+
+	int saveImage = 0;
+	if (argc > 4)
+		saveImage = atoi(argv[4]);
+
 
 	if (useGrayScale)
 		std::cout << "Running with Gray Scale";
@@ -103,11 +110,11 @@ bool RunLucasKanade(int argc, char** argv)
 			std::cout << "Count:" << count << std::endl;
 		++count;
 		warpCoords(warpedCoords, inCoords, H, I.cols, I.rows, true);
-		cv::Mat image;
-		cv::resize(drawBoundingBox(warpedCoords, imageFrame), image, imageFrame.size() / 2);
+		cv::Mat image = drawBoundingBox(warpedCoords, imageFrame);
+		if(saveImage)
+			cv::imwrite("img_" + std::to_string(count) + ".png", image);
+		cv::resize(image, image, imageFrame.size() / 2);
 		showImage(image, "Current Frame");
-		imageFrame.release();
-		image.release();
 		char chCheckForEscKey = cv::waitKey(1);
 		if (chCheckForEscKey == 27)
 		{

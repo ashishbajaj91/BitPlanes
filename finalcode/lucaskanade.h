@@ -196,7 +196,7 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 	//Initializeds(ds);
 	for (int i = 0; i < 100; ++i)
 	{
-		clock_t begin = clock();
+		//clock_t begin = clock();
 
 		auto Ip = ApplyWarpToBitPlanes(I, H);
 		cv::Mat dI; // = ComputeSumedSubtraction(Ip, Iref);
@@ -226,11 +226,11 @@ bool LukasKanade(std::vector<cv::Mat> &I, std::vector<cv::Mat> &Iref, Eigen::Mat
 
 		multi_threads[1].join();
 		error = ComputeMeanError(dI0, M, 1.0*I.size());
-		std::cout << "Current Error:" << error << std::endl;
+		//std::cout << "Current Error:" << error << std::endl;
 
-		clock_t end = clock();
-		double sec_diff = double(end - begin) / CLOCKS_PER_SEC;
-		std::cout << "diff: " << sec_diff << std::endl;
+		//clock_t end = clock();
+		//double sec_diff = double(end - begin) / CLOCKS_PER_SEC;
+		//std::cout << "diff: " << sec_diff << std::endl;
 
 		if ((error0 - error) < epsilon)
 			break;

@@ -3,6 +3,31 @@
 
 #include <Eigen/Dense>
 
+cv::Mat Transpose(cv::Mat image)
+{
+	cv::Mat result;
+	cv::transpose(image, result);
+	return result;
+}
+
+cv::Mat ReshapeImageToColumn(cv::Mat image)
+{
+	image = Transpose(image);
+	cv::Mat result = image.reshape(image.channels(), image.rows * image.cols);
+	return result;
+}
+
+cv::Mat ReshapeImageToRow(cv::Mat image)
+{
+	cv::Mat result = image.reshape(image.channels(), 1);
+	return result;
+}
+
+cv::Mat InnerProduct(cv::Mat mat1, cv::Mat mat2)
+{
+	return Transpose(mat1) * (mat2);
+}
+
 cv::Mat CheckForNaN(cv::Mat &image)
 {
 	cv::Mat IsNaN = (image != image);

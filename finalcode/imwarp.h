@@ -22,7 +22,7 @@ T Interpolate(cv::Mat &image, imwarpdatatype  y, imwarpdatatype  x)
 	imwarpdatatype k2 = modf(y, &yd);
 
 	// Check whether the pixels are within the image
-	if (xi >= 0 && (xi < image.cols - 1) && yi >= 0 && (yi < image.rows - 1))
+	if (x >= 0.0 && (x <= (1.0*image.cols-1)) && y >= 0.0 && (y <= (1.0*image.rows-1)))
 	{
 		int f1 = xi <= image.cols - 2; // Check that pixels to the right
 		int f2 = yi <= image.rows - 2; // and to down direction exist.
@@ -47,7 +47,7 @@ cv::Mat InitializeTargetImage(int nrows, int ncols, int imagetype, cv::Scalar sc
 	return cv::Mat(nrows, ncols, imagetype, scalar);
 }
 
-cv::Mat ApplyWarp(cv::Mat &imgSrc, Eigen::Matrix3d &warpMat, int targetRows, int targetCols)
+cv::Mat ApplyWarp(cv::Mat &imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
 {
 	int imageWidth = imgSrc.cols;
 	int imageHeight = imgSrc.rows;
@@ -75,7 +75,7 @@ cv::Mat ApplyWarp(cv::Mat &imgSrc, Eigen::Matrix3d &warpMat, int targetRows, int
 	return target;
 }
 
-std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matrix3d &warpMat, int targetRows, int targetCols)
+std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matrix3d warpMat, int targetRows, int targetCols)
 {
 	int imageWidth = imgSrc[0].cols;
 	int imageHeight = imgSrc[0].rows;
@@ -101,6 +101,7 @@ std::vector<cv::Mat> ApplyWarpOnPlanes(std::vector<cv::Mat> &imgSrc, Eigen::Matr
 			X = warpMat * U;
 			imwarpdatatype  y = X(0) / X(2);
 			imwarpdatatype  x = X(1) / X(2);
+
 			for (int k = 0; k < imgSrc.size(); k++)
 			{
 				imwarpdatatype  I2 = Interpolate<imwarpdatatype >(imgSrc[k], imwarpdatatype(y + ((imageHeight + 1) / 2.0 - 1)),

@@ -6,10 +6,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-cv::Mat ApplyGaussianFilter(cv::Mat &image, double sigma)
+cv::Mat ApplyGaussianFilter(cv::Mat image, double sigma)
 {
-	cv::Mat result;
-	cv::GaussianBlur(image, result, { 0, 0 }, sigma, sigma);
+	cv::Mat_<double> result;
+	//cv::GaussianBlur(image, result, cv::Size(2*ceil(2*sigma) + 1, 2 * ceil(2 * sigma) + 1) , 0, 0, cv::BORDER_REPLICATE);
+	cv::GaussianBlur(image, result, cv::Size(0,0), sigma, sigma, cv::BORDER_REPLICATE);
 	return result;
 }
 

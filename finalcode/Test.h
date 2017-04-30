@@ -376,12 +376,57 @@ bool testComputeGradientForWarp()
 	double weights[8]; getWeights(vec[0].rows, vec[0].cols, weights);
 	cv::Mat Mref;
 	int keep[8]; getKeep("projective", keep);
-	
+
 	cv::Mat_<double> Ds = ComputeGradientsForWarp(vec, keep, weights, Mref);
+	
 	if(Ds(0,0) == 0 && Ds(0,1) == 0)
 		return true;
 	return false;
 }
+
+//void testgrayscale(const cv::String imagefilename)
+//{
+//	cv::Mat image;
+//	readImage(image, imagefilename);
+//	
+//	cv::Mat gray_image = convertToDouble(convertToGrayScale(image));
+//	gray_image = ApplyGaussianFilter(gray_image, 2.0);
+//	std::cout << gray_image.rows << " " << gray_image.cols << std::endl;
+//
+//	std::vector<cv::Mat> vec; vec.push_back(gray_image);
+//	double weights[8]; getWeights(vec[0].rows, vec[0].cols, weights);
+//	cv::Mat Mref;
+//	int keep[8]; getKeep("projective", keep);
+//
+//	for (int i = 0; i < vec[0].rows; i++)
+//	{
+//		for (int j = 0; j < vec[0].cols; j++)
+//		{
+//			std::cout //<< std::setprecision(2) 
+//				<< vec[0].at<double>(i, j) << " ";
+//		}
+//		std::cout << std::endl;
+//	}
+//
+//
+//	std::cout << gray_image.at<double>(5, 0) << " " << gray_image.at<double>(5, 1) 
+//		<< gray_image.at<double>(5, 1) - gray_image.at<double>(5, 0)
+//		<< std::endl;
+//
+//	cv::Mat_<double> Ds = ComputeGradientsForWarp(vec, keep, weights, Mref);
+//
+//	for (int i = 0; i < Ds.rows/4; i++)
+//	{
+//		for (int j = 0; j < Ds.cols; j++)
+//		{
+//			std::cout << std::setprecision(2) << Ds.at<double>(i, j) << " ";
+//		}
+//		std::cout << std::endl;
+//	}
+//
+//	std::cout << "Non NaN: " << cv::countNonZero(Mref) << std::endl;
+//}
+
 
 void RunTests(int argc, char** argv)
 {
@@ -433,7 +478,6 @@ void RunTests(int argc, char** argv)
 	RunTest(testApplyGaussianFilterOnPlanes(), "Gaussian Filter on Plane");
 	RunTest(testReshapeImageFunction(), "Reshape Image");
 	RunTest(testComputeGradientForWarp(), "Compute Gradients for Warp");
-
 	std::cout << std::endl << "All Tests Done" << std::endl;
 }
 
